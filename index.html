@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TmStars - Yıldız Kazan</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-star"></i> TmStars</h1>
+                <div class="user-stars">
+                    <i class="fas fa-star"></i>
+                    <span id="totalStars">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Welcome Section -->
+            <section class="welcome-section">
+                <div class="welcome-card">
+                    <h2>Hoş Geldin!</h2>
+                    <p>Yıldız kazan ve ödüllerini al!</p>
+                    <div class="daily-bonus">
+                        <button id="dailyBonusBtn" class="bonus-btn">
+                            <i class="fas fa-gift"></i>
+                            Günlük Bonus Al
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Earning Methods -->
+            <section class="earning-methods">
+                <h3>Yıldız Kazanma Yöntemleri</h3>
+                
+                <!-- Watch Ads -->
+                <div class="method-card">
+                    <div class="method-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="method-content">
+                        <h4>Reklam İzle</h4>
+                        <p>Her reklam için 5 yıldız kazan</p>
+                        <button id="watchAdBtn" class="method-btn">
+                            <i class="fas fa-play"></i>
+                            Reklam İzle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Daily Tasks -->
+                <div class="method-card">
+                    <div class="method-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="method-content">
+                        <h4>Günlük Görevler</h4>
+                        <p>Görevleri tamamla, yıldız kazan</p>
+                        <button id="tasksBtn" class="method-btn">
+                            <i class="fas fa-list"></i>
+                            Görevleri Gör
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Invite Friends -->
+                <div class="method-card">
+                    <div class="method-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="method-content">
+                        <h4>Arkadaş Davet Et</h4>
+                        <p>Her davet için 20 yıldız kazan</p>
+                        <button id="inviteBtn" class="method-btn">
+                            <i class="fas fa-share"></i>
+                            Davet Et
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Withdrawal Section -->
+            <section class="withdrawal-section">
+                <h3>Yıldız Çekim Talebi</h3>
+                <div class="withdrawal-card">
+                    <div class="withdrawal-info">
+                        <p>Mevcut Yıldızlarınız: <span id="availableStars">0</span></p>
+                        <p>Minimum Çekim: 100 yıldız</p>
+                    </div>
+                    <div class="withdrawal-form">
+                        <input type="number" id="withdrawalAmount" placeholder="Çekim miktarı" min="100">
+                        <button id="withdrawBtn" class="withdraw-btn">
+                            <i class="fas fa-money-bill-wave"></i>
+                            Çekim Talebi Oluştur
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Leaderboard -->
+            <section class="leaderboard-section">
+                <h3>Lider Tablosu</h3>
+                <div class="leaderboard-card">
+                    <div id="leaderboardList" class="leaderboard-list">
+                        <!-- Leaderboard items will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-section="home">
+                <i class="fas fa-home"></i>
+                Ana Sayfa
+            </button>
+            <button class="nav-btn" data-section="tasks">
+                <i class="fas fa-tasks"></i>
+                Görevler
+            </button>
+            <button class="nav-btn" data-section="withdrawal">
+                <i class="fas fa-money-bill-wave"></i>
+                Çekim
+            </button>
+            <button class="nav-btn" data-section="profile">
+                <i class="fas fa-user"></i>
+                Profil
+            </button>
+        </nav>
+    </div>
+
+    <!-- Modals -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Günlük Görevler</h3>
+            <div id="taskList" class="task-list">
+                <!-- Tasks will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <div id="withdrawalModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Çekim Talebi</h3>
+            <div class="withdrawal-form-modal">
+                <input type="number" id="modalWithdrawalAmount" placeholder="Çekim miktarı" min="100">
+                <textarea id="withdrawalNote" placeholder="Not (opsiyonel)"></textarea>
+                <button id="confirmWithdrawalBtn" class="confirm-btn">
+                    <i class="fas fa-check"></i>
+                    Talebi Onayla
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
