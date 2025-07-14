@@ -166,6 +166,7 @@ body {
     text-align: center;
     color: var(--star-color);
     box-shadow: var(--shadow);
+    margin-bottom: 0.7rem;
 }
 
 .welcome-icon {
@@ -212,6 +213,7 @@ body {
     text-align: center;
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow);
+    margin-top: 0;
 }
 
 .ad-icon {
