@@ -584,10 +584,12 @@ function toggleTheme() {
     
     body.setAttribute('data-theme', newTheme);
     localStorage.setItem('starearn_theme', newTheme);
-    
-    // Update theme toggle icon
+    updateThemeToggleIcon(newTheme);
+}
+
+function updateThemeToggleIcon(theme) {
     const themeToggle = document.getElementById('theme-toggle');
-    if (newTheme === 'dark') {
+    if (theme === 'dark') {
         themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
     } else {
         themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
@@ -702,9 +704,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedTheme = localStorage.getItem('starearn_theme');
     if (savedTheme) {
         document.body.setAttribute('data-theme', savedTheme);
-        const themeToggle = document.getElementById('theme-toggle');
-        if (savedTheme === 'dark') {
-            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        }
+        updateThemeToggleIcon(savedTheme);
+    } else {
+        updateThemeToggleIcon('light');
     }
 }); 
