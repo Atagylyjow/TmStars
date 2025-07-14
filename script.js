@@ -1,3 +1,5 @@
+// StarEarn - Reklam İzleyerek Yıldız Kazanma App
+
 // Telegram Web App initialization
 let tg = window.Telegram.WebApp;
 tg.ready();
@@ -5,26 +7,47 @@ tg.expand();
 
 // App state
 let userData = {
-    stars: 0,
-    dailyBonusClaimed: false,
-    lastDailyBonus: null,
-    completedTasks: [],
-    withdrawalHistory: []
+    stars: 0.00,
+    level: 'Bronze',
+    experience: 0,
+    dailyAdsWatched: 0,
+    lastAdDate: null,
+    totalEarnings: 0.00,
+    withdrawalHistory: [],
+    tasks: {
+        watchAds: { completed: 0, target: 10, reward: 0.50, claimed: false },
+        inviteFriends: { completed: 0, target: 3, reward: 5.00, claimed: false },
+        dailyLogin: { completed: 0, target: 7, reward: 5.00, claimed: false }
+    },
+    consecutiveLogins: 0,
+    lastLoginDate: null
 };
 
+// Level system configuration
+const LEVELS = {
+    'Bronze': { min: 0, max: 100, multiplier: 1.0 },
+    'Silver': { min: 101, max: 250, multiplier: 1.2 },
+    'Gold': { min: 251, max: 500, multiplier: 1.5 },
+    'Platinum': { min: 501, max: Infinity, multiplier: 2.0 }
+};
+
+// API Configuration
+const API_BASE_URL = 'http://localhost:3000/api';
+// Production: const API_BASE_URL = 'https://your-domain.com/api';
+
 // Initialize app
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     initializeApp();
     setupEventListeners();
-    loadUserData();
+    await loadUserData();
     updateUI();
-    loadLeaderboard();
+    await loadLeaderboard();
 });
 
 // Initialize app
 function initializeApp() {
     // Set theme colors
-    tg.setHeaderColor('#667eea');
+    tg.setHeaderColor('#FFD700');
     tg.setBackgroundColor('#f8f9fa');
     
     // Get user info
@@ -33,25 +56,34 @@ function initializeApp() {
         userData.userId = user.id;
         userData.username = user.username || `User${user.id}`;
         userData.firstName = user.first_name || 'User';
+        userData.lastName = user.last_name || '';
     }
+    
+    // Update user info display
+    document.getElementById('user-name').textContent = userData.firstName;
+    document.getElementById('user-id').textContent = `ID: ${userData.userId}`;
 }
 
 // Setup event listeners
 function setupEventListeners() {
-    // Daily bonus button
-    document.getElementById('dailyBonusBtn').addEventListener('click', claimDailyBonus);
-    
     // Watch ad button
-    document.getElementById('watchAdBtn').addEventListener('click', watchAd);
+    document.getElementById('watch-ad-btn').addEventListener('click', watchAd);
     
-    // Tasks button
-    document.getElementById('tasksBtn').addEventListener('click', showTasks);
+    // Task buttons
+    document.querySelectorAll('.task-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const taskType = this.dataset.task;
+            claimTaskReward(taskType);
+        });
+    });
     
-    // Invite button
-    document.getElementById('inviteBtn').addEventListener('click', inviteFriends);
-    
-    // Withdrawal button
-    document.getElementById('withdrawBtn').addEventListener('click', showWithdrawalModal);
+    // Withdrawal buttons
+    document.querySelectorAll('.withdrawal-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const method = this.dataset.method;
+            showWithdrawalModal(method);
+        });
+    });
     
     // Navigation buttons
     document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -61,15 +93,29 @@ function setupEventListeners() {
         });
     });
     
+    // Leaderboard tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tab = this.dataset.tab;
+            switchLeaderboardTab(tab);
+        });
+    });
+    
     // Modal close buttons
-    document.querySelectorAll('.close').forEach(closeBtn => {
+    document.querySelectorAll('.modal-close').forEach(closeBtn => {
         closeBtn.addEventListener('click', function() {
             this.closest('.modal').style.display = 'none';
         });
     });
     
-    // Confirm withdrawal button
-    document.getElementById('confirmWithdrawalBtn').addEventListener('click', confirmWithdrawal);
+    // Withdrawal form
+    document.getElementById('withdrawal-confirm').addEventListener('click', confirmWithdrawal);
+    document.getElementById('withdrawal-cancel').addEventListener('click', function() {
+        document.getElementById('withdrawal-modal').style.display = 'none';
+    });
+    
+    // Theme toggle
+    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
     
     // Close modals when clicking outside
     window.addEventListener('click', function(event) {
@@ -79,256 +125,319 @@ function setupEventListeners() {
     });
 }
 
-// Load user data from localStorage
-function loadUserData() {
-    const saved = localStorage.getItem('tmstars_user_data');
-    if (saved) {
-        const savedData = JSON.parse(saved);
-        userData = { ...userData, ...savedData };
+// Load user data from MongoDB API
+async function loadUserData() {
+    try {
+        if (userData.userId) {
+            const response = await fetch(`${API_BASE_URL}/users/profile/${userData.userId}`);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    userData = { ...userData, ...data.user };
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Failed to load user data:', error);
+        // Fallback to localStorage if API fails
+        const saved = localStorage.getItem('starearn_user_data');
+        if (saved) {
+            const savedData = JSON.parse(saved);
+            userData = { ...userData, ...savedData };
+        }
     }
     
-    // Check if daily bonus can be claimed
-    checkDailyBonus();
+    // Check daily reset
+    checkDailyReset();
+    // Check consecutive login
+    checkConsecutiveLogin();
+    // Update level
+    updateUserLevel();
 }
 
-// Save user data to localStorage
-function saveUserData() {
-    localStorage.setItem('tmstars_user_data', JSON.stringify(userData));
+// Save user data to MongoDB API
+async function saveUserData() {
+    try {
+        if (userData.userId) {
+            const response = await fetch(`${API_BASE_URL}/users/profile/${userData.userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    telegramId: userData.userId,
+                    stars: userData.stars,
+                    level: userData.level,
+                    experience: userData.experience,
+                    dailyAdsWatched: userData.dailyAdsWatched,
+                    lastAdDate: userData.lastAdDate,
+                    totalEarnings: userData.totalEarnings,
+                    tasks: userData.tasks,
+                    consecutiveLogins: userData.consecutiveLogins,
+                    lastLoginDate: userData.lastLoginDate
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to save user data');
+            }
+        }
+    } catch (error) {
+        console.error('Failed to save user data:', error);
+        // Fallback to localStorage
+        localStorage.setItem('starearn_user_data', JSON.stringify(userData));
+    }
 }
 
 // Update UI with current data
 function updateUI() {
-    document.getElementById('totalStars').textContent = userData.stars;
-    document.getElementById('availableStars').textContent = userData.stars;
+    document.getElementById('user-stars').textContent = userData.stars.toFixed(2);
+    document.getElementById('user-level').textContent = userData.level;
+    document.getElementById('ads-watched-today').textContent = userData.dailyAdsWatched;
+    document.getElementById('ads-limit').textContent = '50';
     
-    // Update daily bonus button
-    const dailyBonusBtn = document.getElementById('dailyBonusBtn');
-    if (userData.dailyBonusClaimed) {
-        dailyBonusBtn.innerHTML = '<i class="fas fa-check"></i> Bugün Alındı';
-        dailyBonusBtn.disabled = true;
-        dailyBonusBtn.style.opacity = '0.6';
+    // Update task progress
+    updateTaskProgress();
+    
+    // Update withdrawal modal
+    document.getElementById('current-stars').textContent = userData.stars.toFixed(2);
+    
+    // Update watch ad button
+    const watchAdBtn = document.getElementById('watch-ad-btn');
+    if (userData.dailyAdsWatched >= 50) {
+        watchAdBtn.disabled = true;
+        watchAdBtn.innerHTML = '<i class="fas fa-clock"></i> Günlük Limit Doldu';
     } else {
-        dailyBonusBtn.innerHTML = '<i class="fas fa-gift"></i> Günlük Bonus Al';
-        dailyBonusBtn.disabled = false;
-        dailyBonusBtn.style.opacity = '1';
+        watchAdBtn.disabled = false;
+        watchAdBtn.innerHTML = '<i class="fas fa-play"></i> Reklam İzle';
     }
 }
 
-// Check daily bonus availability
-function checkDailyBonus() {
+// Check daily reset
+function checkDailyReset() {
     const now = new Date();
     const today = now.toDateString();
     
-    if (userData.lastDailyBonus === today) {
-        userData.dailyBonusClaimed = true;
-    } else {
-        userData.dailyBonusClaimed = false;
+    if (userData.lastAdDate !== today) {
+        userData.dailyAdsWatched = 0;
+        userData.lastAdDate = today;
+        
+        // Reset task progress
+        userData.tasks.watchAds.completed = 0;
+        userData.tasks.watchAds.claimed = false;
+        userData.tasks.inviteFriends.claimed = false;
     }
 }
 
-// Claim daily bonus
-function claimDailyBonus() {
-    if (userData.dailyBonusClaimed) {
-        showMessage('Bugün zaten günlük bonusunuzu aldınız!', 'error');
-        return;
+// Check consecutive login
+function checkConsecutiveLogin() {
+    const now = new Date();
+    const today = now.toDateString();
+    
+    if (userData.lastLoginDate !== today) {
+        if (userData.lastLoginDate) {
+            const lastLogin = new Date(userData.lastLoginDate);
+            const daysDiff = Math.floor((now - lastLogin) / (1000 * 60 * 60 * 24));
+            
+            if (daysDiff === 1) {
+                userData.consecutiveLogins++;
+                userData.tasks.dailyLogin.completed = Math.min(userData.consecutiveLogins, 7);
+            } else if (daysDiff > 1) {
+                userData.consecutiveLogins = 1;
+                userData.tasks.dailyLogin.completed = 1;
+            }
+        } else {
+            userData.consecutiveLogins = 1;
+            userData.tasks.dailyLogin.completed = 1;
+        }
+        
+        userData.lastLoginDate = today;
     }
+}
+
+// Update user level based on stars
+function updateUserLevel() {
+    const stars = userData.stars;
     
-    const bonus = 50; // Daily bonus amount
-    userData.stars += bonus;
-    userData.dailyBonusClaimed = true;
-    userData.lastDailyBonus = new Date().toDateString();
-    
-    saveUserData();
-    updateUI();
-    
-    showMessage(`🎉 Günlük bonus alındı! +${bonus} yıldız kazandınız!`, 'success');
-    
-    // Haptic feedback
-    if (tg.HapticFeedback) {
-        tg.HapticFeedback.impactOccurred('medium');
+    if (stars >= 501) {
+        userData.level = 'Platinum';
+    } else if (stars >= 251) {
+        userData.level = 'Gold';
+    } else if (stars >= 101) {
+        userData.level = 'Silver';
+    } else {
+        userData.level = 'Bronze';
     }
 }
 
 // Watch ad function
-function watchAd() {
-    const button = document.getElementById('watchAdBtn');
-    const originalText = button.innerHTML;
-    
-    // Simulate ad watching
-    button.innerHTML = '<div class="loading"></div> Reklam İzleniyor...';
-    button.disabled = true;
-    
-    setTimeout(() => {
-        const reward = 5;
-        userData.stars += reward;
-        saveUserData();
-        updateUI();
-        
-        button.innerHTML = originalText;
-        button.disabled = false;
-        
-        showMessage(`📺 Reklam izlendi! +${reward} yıldız kazandınız!`, 'success');
-        
-        // Haptic feedback
-        if (tg.HapticFeedback) {
-            tg.HapticFeedback.impactOccurred('light');
-        }
-    }, 3000);
-}
-
-// Show tasks modal
-function showTasks() {
-    const modal = document.getElementById('taskModal');
-    const taskList = document.getElementById('taskList');
-    
-    // Generate daily tasks
-    const tasks = generateDailyTasks();
-    
-    taskList.innerHTML = '';
-    tasks.forEach(task => {
-        const taskItem = createTaskElement(task);
-        taskList.appendChild(taskItem);
-    });
-    
-    modal.style.display = 'block';
-}
-
-// Generate daily tasks
-function generateDailyTasks() {
-    const tasks = [
-        {
-            id: 'login',
-            title: 'Giriş Yap',
-            description: 'Uygulamaya giriş yap',
-            reward: 10,
-            completed: userData.completedTasks.includes('login')
-        },
-        {
-            id: 'watch_3_ads',
-            title: '3 Reklam İzle',
-            description: '3 farklı reklam izle',
-            reward: 15,
-            completed: userData.completedTasks.includes('watch_3_ads')
-        },
-        {
-            id: 'invite_friend',
-            title: 'Arkadaş Davet Et',
-            description: 'Bir arkadaşını davet et',
-            reward: 25,
-            completed: userData.completedTasks.includes('invite_friend')
-        },
-        {
-            id: 'daily_bonus',
-            title: 'Günlük Bonus Al',
-            description: 'Günlük bonusunu al',
-            reward: 20,
-            completed: userData.dailyBonusClaimed
-        }
-    ];
-    
-    return tasks;
-}
-
-// Create task element
-function createTaskElement(task) {
-    const taskItem = document.createElement('div');
-    taskItem.className = `task-item ${task.completed ? 'completed' : ''}`;
-    
-    taskItem.innerHTML = `
-        <div class="task-checkbox" onclick="completeTask('${task.id}')">
-            ${task.completed ? '<i class="fas fa-check"></i>' : ''}
-        </div>
-        <div class="task-content">
-            <h4>${task.title}</h4>
-            <p>${task.description}</p>
-        </div>
-        <div class="task-reward">
-            <i class="fas fa-star"></i>
-            ${task.reward}
-        </div>
-    `;
-    
-    return taskItem;
-}
-
-// Complete task
-function completeTask(taskId) {
-    const task = generateDailyTasks().find(t => t.id === taskId);
-    
-    if (!task || task.completed) {
+async function watchAd() {
+    if (userData.dailyAdsWatched >= 50) {
+        showMessage('Günlük reklam limitiniz doldu!', 'error');
         return;
     }
     
-    // Mark task as completed
-    if (!userData.completedTasks.includes(taskId)) {
-        userData.completedTasks.push(taskId);
-        userData.stars += task.reward;
-        saveUserData();
-        updateUI();
+    const watchAdBtn = document.getElementById('watch-ad-btn');
+    const progressContainer = document.getElementById('progress-container');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    
+    // Disable button and show progress
+    watchAdBtn.disabled = true;
+    watchAdBtn.innerHTML = '<i class="fas fa-clock"></i> Reklam İzleniyor...';
+    progressContainer.style.display = 'block';
+    
+    // Simulate ad watching (15 seconds)
+    const adDuration = 15000; // 15 seconds
+    const updateInterval = 100; // Update every 100ms
+    const totalUpdates = adDuration / updateInterval;
+    let currentUpdate = 0;
+    
+    const progressInterval = setInterval(() => {
+        currentUpdate++;
+        const progress = (currentUpdate / totalUpdates) * 100;
         
-        showMessage(`✅ Görev tamamlandı! +${task.reward} yıldız kazandınız!`, 'success');
+        progressFill.style.width = `${progress}%`;
+        progressText.textContent = `${Math.round(progress)}%`;
         
-        // Refresh task list
-        showTasks();
-        
-        // Haptic feedback
-        if (tg.HapticFeedback) {
-            tg.HapticFeedback.impactOccurred('medium');
+        if (currentUpdate >= totalUpdates) {
+            clearInterval(progressInterval);
+            
+            // Ad completed
+            const baseReward = 0.10;
+            const levelMultiplier = LEVELS[userData.level].multiplier;
+            const reward = baseReward * levelMultiplier;
+            
+            userData.stars += reward;
+            userData.dailyAdsWatched++;
+            userData.totalEarnings += reward;
+            userData.tasks.watchAds.completed++;
+            
+            // Update level
+            updateUserLevel();
+            
+            // Save data
+            saveUserData();
+            
+            // Update UI
+            updateUI();
+            
+            // Show success message
+            showMessage(`+${reward.toFixed(2)} yıldız kazandınız!`, 'success');
+            
+            // Reset button and hide progress
+            watchAdBtn.disabled = false;
+            watchAdBtn.innerHTML = '<i class="fas fa-play"></i> Reklam İzle';
+            progressContainer.style.display = 'none';
+            progressFill.style.width = '0%';
+            progressText.textContent = '0%';
+            
+            // Add star earned animation
+            const starDisplay = document.getElementById('user-stars');
+            starDisplay.classList.add('star-earned');
+            setTimeout(() => starDisplay.classList.remove('star-earned'), 500);
         }
-    }
+    }, updateInterval);
 }
 
-// Invite friends
-function inviteFriends() {
-    const inviteText = `🌟 TmStars uygulamasını deneyin! Yıldız kazanın ve ödüllerinizi alın! 🎁\n\n${window.location.href}`;
+// Update task progress
+function updateTaskProgress() {
+    // Watch ads task
+    const watchProgress = (userData.tasks.watchAds.completed / userData.tasks.watchAds.target) * 100;
+    document.getElementById('task-watch-progress').style.width = `${watchProgress}%`;
+    document.getElementById('task-watch-text').textContent = `${userData.tasks.watchAds.completed}/${userData.tasks.watchAds.target}`;
     
-    if (tg.showPopup) {
-        tg.showPopup({
-            title: 'Arkadaş Davet Et',
-            message: 'Arkadaşlarınızı davet etmek için paylaşım yapın!',
-            buttons: [
-                {
-                    type: 'share',
-                    text: 'Paylaş'
-                },
-                {
-                    type: 'cancel',
-                    text: 'İptal'
-                }
-            ]
-        });
-    } else {
-        // Fallback for web
-        if (navigator.share) {
-            navigator.share({
-                title: 'TmStars - Yıldız Kazan',
-                text: inviteText,
-                url: window.location.href
-            });
+    // Invite friends task
+    const inviteProgress = (userData.tasks.inviteFriends.completed / userData.tasks.inviteFriends.target) * 100;
+    document.getElementById('task-invite-progress').style.width = `${inviteProgress}%`;
+    document.getElementById('task-invite-text').textContent = `${userData.tasks.inviteFriends.completed}/${userData.tasks.inviteFriends.target}`;
+    
+    // Daily login task
+    const loginProgress = (userData.tasks.dailyLogin.completed / userData.tasks.dailyLogin.target) * 100;
+    document.getElementById('task-login-progress').style.width = `${loginProgress}%`;
+    document.getElementById('task-login-text').textContent = `${userData.tasks.dailyLogin.completed}/${userData.tasks.dailyLogin.target}`;
+    
+    // Update task buttons
+    updateTaskButtons();
+}
+
+// Update task buttons
+function updateTaskButtons() {
+    const tasks = ['watch-ads', 'invite-friends', 'daily-login'];
+    
+    tasks.forEach(taskType => {
+        const task = userData.tasks[taskType.replace('-', '')];
+        const btn = document.querySelector(`[data-task="${taskType}"]`);
+        
+        if (task.completed >= task.target && !task.claimed) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-gift"></i> Ödülü Al';
+            btn.classList.remove('btn-secondary');
+            btn.classList.add('btn-primary');
+        } else if (task.claimed) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-check"></i> Tamamlandı';
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-secondary');
         } else {
-            // Copy to clipboard
-            navigator.clipboard.writeText(inviteText).then(() => {
-                showMessage('Davet linki kopyalandı!', 'success');
-            });
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-lock"></i> Kilitli';
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-secondary');
         }
+    });
+}
+
+// Claim task reward
+async function claimTaskReward(taskType) {
+    const taskKey = taskType.replace('-', '');
+    const task = userData.tasks[taskKey];
+    
+    if (task.completed >= task.target && !task.claimed) {
+        userData.stars += task.reward;
+        task.claimed = true;
+        
+        // Update level
+        updateUserLevel();
+        
+        // Save data
+        await saveUserData();
+        
+        // Update UI
+        updateUI();
+        
+        // Show success message
+        showMessage(`+${task.reward.toFixed(2)} yıldız kazandınız!`, 'success');
+        
+        // Add star earned animation
+        const starDisplay = document.getElementById('user-stars');
+        starDisplay.classList.add('star-earned');
+        setTimeout(() => starDisplay.classList.remove('star-earned'), 500);
     }
 }
 
 // Show withdrawal modal
-function showWithdrawalModal() {
-    const modal = document.getElementById('withdrawalModal');
-    document.getElementById('modalWithdrawalAmount').value = '';
-    document.getElementById('withdrawalNote').value = '';
+function showWithdrawalModal(method) {
+    const modal = document.getElementById('withdrawal-modal');
+    const phoneGroup = document.getElementById('phone-group');
+    
+    if (method === 'phone') {
+        phoneGroup.style.display = 'block';
+    } else {
+        phoneGroup.style.display = 'none';
+    }
+    
     modal.style.display = 'block';
 }
 
 // Confirm withdrawal
-function confirmWithdrawal() {
-    const amount = parseInt(document.getElementById('modalWithdrawalAmount').value);
-    const note = document.getElementById('withdrawalNote').value;
+async function confirmWithdrawal() {
+    const amount = parseFloat(document.getElementById('withdrawal-amount').value);
+    const method = document.querySelector('.withdrawal-btn.active')?.dataset.method || 'telegram';
+    const phoneNumber = document.getElementById('phone-number').value;
     
-    if (!amount || amount < 100) {
-        showMessage('Minimum çekim miktarı 100 yıldızdır!', 'error');
+    if (!amount || amount < 20) {
+        showMessage('Minimum çekim miktarı 20 yıldızdır!', 'error');
         return;
     }
     
@@ -337,137 +446,265 @@ function confirmWithdrawal() {
         return;
     }
     
-    // Create withdrawal request
-    const withdrawal = {
-        id: Date.now(),
-        amount: amount,
-        note: note,
-        status: 'pending',
-        date: new Date().toISOString()
-    };
+    if (method === 'phone' && !phoneNumber) {
+        showMessage('Telefon numarası gerekli!', 'error');
+        return;
+    }
     
-    userData.stars -= amount;
-    userData.withdrawalHistory.push(withdrawal);
-    
-    saveUserData();
-    updateUI();
-    
-    document.getElementById('withdrawalModal').style.display = 'none';
-    
-    showMessage(`✅ Çekim talebi oluşturuldu! ${amount} yıldız çekildi.`, 'success');
-    
-    // Haptic feedback
-    if (tg.HapticFeedback) {
-        tg.HapticFeedback.impactOccurred('medium');
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/withdraw`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                telegramId: userData.userId,
+                amount: amount,
+                method: method,
+                phoneNumber: phoneNumber
+            })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                userData.stars -= amount;
+                userData.withdrawalHistory.push({
+                    amount: amount,
+                    method: method,
+                    date: new Date(),
+                    status: 'pending'
+                });
+                
+                await saveUserData();
+                updateUI();
+                
+                document.getElementById('withdrawal-modal').style.display = 'none';
+                showSuccessMessage('Çekim talebiniz alındı! En kısa sürede işleme alınacaktır.');
+            } else {
+                showMessage(data.message || 'Çekim işlemi başarısız!', 'error');
+            }
+        } else {
+            showMessage('Çekim işlemi başarısız!', 'error');
+        }
+    } catch (error) {
+        console.error('Withdrawal error:', error);
+        showMessage('Çekim işlemi başarısız!', 'error');
     }
 }
 
 // Navigate to section
 function navigateToSection(section) {
-    // Update navigation buttons
+    // Remove active class from all nav buttons
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('active');
     });
+    
+    // Add active class to clicked button
     document.querySelector(`[data-section="${section}"]`).classList.add('active');
     
     // Show/hide sections based on navigation
-    // For now, we'll just scroll to the appropriate section
-    const sections = {
-        home: '.welcome-section',
-        tasks: '.earning-methods',
-        withdrawal: '.withdrawal-section',
-        profile: '.leaderboard-section'
-    };
+    const sections = ['welcome-section', 'watch-ad-section', 'tasks-section', 'withdrawal-section', 'leaderboard-section'];
     
-    const targetSection = document.querySelector(sections[section]);
-    if (targetSection) {
-        targetSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    sections.forEach(sec => {
+        const element = document.querySelector(`.${sec}`);
+        if (element) {
+            if (section === 'home' && (sec === 'welcome-section' || sec === 'watch-ad-section')) {
+                element.style.display = 'block';
+            } else if (section === 'tasks' && sec === 'tasks-section') {
+                element.style.display = 'block';
+            } else if (section === 'withdrawal' && sec === 'withdrawal-section') {
+                element.style.display = 'block';
+            } else if (section === 'profile') {
+                // Show profile section (implement later)
+                element.style.display = 'none';
+            } else {
+                element.style.display = 'none';
+            }
+        }
+    });
+}
+
+// Switch leaderboard tab
+function switchLeaderboardTab(tab) {
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Add active class to clicked tab
+    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+    
+    // Load leaderboard data for selected tab
+    loadLeaderboard(tab);
 }
 
 // Load leaderboard
-function loadLeaderboard() {
-    const leaderboardList = document.getElementById('leaderboardList');
-    
-    // Sample leaderboard data
-    const leaderboard = [
-        { rank: 1, name: 'Ahmet Yılmaz', stars: 1250, isCurrentUser: false },
-        { rank: 2, name: 'Ayşe Demir', stars: 980, isCurrentUser: false },
-        { rank: 3, name: 'Mehmet Kaya', stars: 750, isCurrentUser: false },
-        { rank: 4, name: 'Fatma Özkan', stars: 620, isCurrentUser: false },
-        { rank: 5, name: 'Ali Çelik', stars: 480, isCurrentUser: false }
-    ];
-    
-    // Add current user if not in top 5
-    if (userData.username) {
-        const currentUserRank = leaderboard.findIndex(user => user.stars <= userData.stars) + 1;
-        if (currentUserRank > 5) {
-            leaderboard.push({
-                rank: currentUserRank,
-                name: userData.firstName,
-                stars: userData.stars,
-                isCurrentUser: true
-            });
+async function loadLeaderboard(period = 'daily') {
+    try {
+        const response = await fetch(`${API_BASE_URL}/leaderboard/${period}`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                displayLeaderboard(data.leaderboard);
+            }
         }
+    } catch (error) {
+        console.error('Failed to load leaderboard:', error);
+        // Show placeholder data
+        displayLeaderboard([]);
+    }
+}
+
+// Display leaderboard
+function displayLeaderboard(leaderboard) {
+    const leaderboardList = document.getElementById('leaderboard-list');
+    
+    if (leaderboard.length === 0) {
+        leaderboardList.innerHTML = '<p class="text-center">Henüz veri yok</p>';
+        return;
     }
     
-    leaderboardList.innerHTML = '';
-    leaderboard.slice(0, 10).forEach(user => {
-        const rankClass = user.rank === 1 ? 'gold' : user.rank === 2 ? 'silver' : user.rank === 3 ? 'bronze' : '';
-        const userClass = user.isCurrentUser ? 'current-user' : '';
-        
-        const leaderboardItem = document.createElement('div');
-        leaderboardItem.className = `leaderboard-item ${userClass}`;
-        
-        leaderboardItem.innerHTML = `
-            <div class="leaderboard-rank ${rankClass}">${user.rank}</div>
-            <div class="leaderboard-user">
-                <h4>${user.name}</h4>
-                <p>${user.isCurrentUser ? 'Sen' : 'Oyuncu'}</p>
+    leaderboardList.innerHTML = leaderboard.map((user, index) => `
+        <div class="leaderboard-item">
+            <div class="rank">${index + 1}</div>
+            <div class="user-info">
+                <div class="username">${user.username}</div>
+                <div class="stars">${user.stars.toFixed(2)} yıldız</div>
             </div>
-            <div class="leaderboard-stars">
-                <i class="fas fa-star"></i>
-                ${user.stars}
-            </div>
-        `;
-        
-        leaderboardList.appendChild(leaderboardItem);
-    });
+        </div>
+    `).join('');
+}
+
+// Toggle theme
+function toggleTheme() {
+    const body = document.body;
+    const currentTheme = body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('starearn_theme', newTheme);
+    
+    // Update theme toggle icon
+    const themeToggle = document.getElementById('theme-toggle');
+    if (newTheme === 'dark') {
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    } else {
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+    }
 }
 
 // Show message
 function showMessage(message, type = 'success') {
-    // Remove existing messages
-    const existingMessages = document.querySelectorAll('.message');
-    existingMessages.forEach(msg => msg.remove());
+    // Create message element
+    const messageEl = document.createElement('div');
+    messageEl.className = `message message-${type}`;
+    messageEl.textContent = message;
     
-    // Create new message
-    const messageElement = document.createElement('div');
-    messageElement.className = `message ${type}`;
-    messageElement.textContent = message;
+    // Add styles
+    messageEl.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+        max-width: 300px;
+    `;
     
-    // Insert at the top of main content
-    const mainContent = document.querySelector('.main-content');
-    mainContent.insertBefore(messageElement, mainContent.firstChild);
+    if (type === 'success') {
+        messageEl.style.background = '#28a745';
+    } else if (type === 'error') {
+        messageEl.style.background = '#dc3545';
+    } else {
+        messageEl.style.background = '#17a2b8';
+    }
     
-    // Auto remove after 3 seconds
+    // Add to page
+    document.body.appendChild(messageEl);
+    
+    // Remove after 3 seconds
     setTimeout(() => {
-        if (messageElement.parentNode) {
-            messageElement.remove();
-        }
+        messageEl.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            if (messageEl.parentNode) {
+                messageEl.parentNode.removeChild(messageEl);
+            }
+        }, 300);
     }, 3000);
 }
 
-// Periodic updates
-setInterval(() => {
-    checkDailyBonus();
-    updateUI();
-}, 60000); // Check every minute
+// Show success modal
+function showSuccessMessage(message) {
+    document.getElementById('success-message').textContent = message;
+    document.getElementById('success-modal').style.display = 'block';
+    
+    setTimeout(() => {
+        document.getElementById('success-modal').style.display = 'none';
+    }, 3000);
+}
 
-// Save data before page unload
-window.addEventListener('beforeunload', () => {
-    saveUserData();
-});
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .leaderboard-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .rank {
+        background: var(--gradient-primary);
+        color: var(--secondary-blue);
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+    
+    .user-info {
+        flex: 1;
+    }
+    
+    .username {
+        font-weight: bold;
+        color: var(--text-primary);
+    }
+    
+    .stars {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+`;
+document.head.appendChild(style);
 
-// Export functions for global access
-window.completeTask = completeTask; 
+// Load theme on startup
+document.addEventListener('DOMContentLoaded', function() {
+    const savedTheme = localStorage.getItem('starearn_theme');
+    if (savedTheme) {
+        document.body.setAttribute('data-theme', savedTheme);
+        const themeToggle = document.getElementById('theme-toggle');
+        if (savedTheme === 'dark') {
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+    }
+}); 

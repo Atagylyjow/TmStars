@@ -1,238 +1,316 @@
-# TmStars - Telegram Mini App
+# StarEarn - Reklam İzleyerek Yıldız Kazanma Telegram Web App
 
-🌟 **Yıldız Kazanma Sistemi** - Telegram Mini App
+Bu proje, Telegram Web App teknolojisi kullanarak reklam izleyerek yıldız kazanma uygulamasıdır.
 
-Bu proje, Telegram kullanıcılarının yıldız kazanabilecekleri, reklam izleyebilecekleri ve ödüllerini çekebilecekleri modern bir mini uygulamadır.
+## 🌟 Özellikler
 
-## ✨ Özellikler
+- **Reklam İzleme Sistemi**: 15 saniye reklam izleyerek 0.10 yıldız kazanma
+- **Seviye Sistemi**: Bronze, Silver, Gold, Platinum seviyeleri ile çarpan sistemi
+- **Günlük Görevler**: 10 reklam izleme, arkadaş davet etme, 7 gün üst üste giriş
+- **Yıldız Çekme**: Telegram hesabına veya telefon numarasına TMT olarak çekme
+- **Liderlik Tablosu**: Günlük, haftalık, aylık sıralamalar
+- **Modern UI/UX**: Dark/Light tema desteği ile modern tasarım
+- **Telegram Entegrasyonu**: Telegram Web App API'si ile tam entegrasyon
+- **Responsive Tasarım**: Mobil ve masaüstü cihazlarda mükemmel görünüm
+- **Animasyonlar**: Yıldız kazanma ve seviye atlama animasyonları
 
-### 🎯 Ana Özellikler
-- **Günlük Bonus Sistemi** - Her gün 50 yıldız bonus
-- **Reklam İzleme** - Her reklam için 5 yıldız kazanma
-- **Günlük Görevler** - Çeşitli görevlerle yıldız kazanma
-- **Arkadaş Davet Etme** - Her davet için 20 yıldız
-- **Yıldız Çekim Sistemi** - Minimum 100 yıldız ile çekim talebi
-- **Lider Tablosu** - En çok yıldız kazananları görme
+## 🎮 Oyunlaştırma Sistemi
 
-### 🎨 Tasarım Özellikleri
-- **Modern UI/UX** - Gradient renkler ve animasyonlar
-- **Responsive Tasarım** - Tüm cihazlarda uyumlu
-- **Telegram Entegrasyonu** - Native Telegram Web App API
-- **Haptic Feedback** - Dokunsal geri bildirim
-- **Smooth Animations** - Akıcı geçişler ve efektler
+### Seviye Sistemi
+- **Bronze** (0-100 yıldız): 1.0x kazanç
+- **Silver** (101-250 yıldız): 1.2x kazanç
+- **Gold** (251-500 yıldız): 1.5x kazanç
+- **Platinum** (501+ yıldız): 2.0x kazanç
 
-### 📱 Teknik Özellikler
-- **Vanilla JavaScript** - Framework bağımsız
-- **LocalStorage** - Veri saklama
-- **Telegram Web App API** - Tam entegrasyon
-- **Progressive Web App** - PWA özellikleri
-- **Cross-Platform** - Web ve Telegram uyumlu
+### Günlük Görevler
+- **10 Reklam İzle**: 0.50 bonus yıldız
+- **3 Arkadaş Davet Et**: 5.00 bonus yıldız
+- **7 Gün Üst Üste Giriş**: 5.00 bonus yıldız
+
+### Özel Etkinlikler
+- **Hafta Sonu**: 1.5x yıldız kazanç
+- **Özel Günler**: 3x yıldız kazanç (yönetici tarafından belirlenir)
+
+## 💰 Para Çekme Sistemi
+
+### Minimum Çekim
+- **20 yıldız** minimum çekim miktarı
+
+### Ödeme Yöntemleri
+- **Telegram Hesabına**: Yıldızları Telegram hesabına gönderme
+- **Telefon Numarasına TMT**: Telefon numarasına TMT olarak gönderme
+
+## 🎨 Tasarım Özellikleri
+
+### Renk Paleti
+- **Ana Renk**: Altın sarısı (#FFD700)
+- **İkincil**: Koyu mavi (#1E3A8A)
+- **Vurgu**: Turuncu (#FF6B35)
+
+### Animasyonlar
+- Yıldız kazanma animasyonu
+- Seviye atlama efekti
+- Reklam izleme progress bar'ı
+- Smooth geçişler ve hover efektleri
+
+## 🌐 Canlı Demo
+
+Web App'e erişmek için: [Render Link](https://tg-web-app-fg41.onrender.com/)
+
+## 📁 Dosya Yapısı
+
+```
+├── index.html          # Ana HTML dosyası
+├── styles.css          # CSS stilleri
+├── script.js           # JavaScript kodu
+├── server.js           # Backend server
+├── admin.html          # Admin paneli
+├── admin.js            # Admin panel JavaScript
+├── package.json        # Bağımlılıklar
+├── README.md           # Bu dosya
+└── mongodb-backups/    # Veritabanı yedekleri
+```
 
 ## 🚀 Kurulum
 
-### Gereksinimler
-- Modern web tarayıcısı
-- Telegram hesabı (mini app için)
-- Web sunucusu (canlıya almak için)
+### 1. Telegram Bot Oluşturma
 
-### Yerel Geliştirme
-1. Projeyi klonlayın:
+1. Telegram'da [@BotFather](https://t.me/botfather) ile konuşun
+2. `/newbot` komutunu gönderin
+3. Bot adını ve kullanıcı adını belirleyin
+4. Bot token'ınızı alın (örn: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`)
+
+### 2. Web App URL'sini Ayarlama
+
+1. [@BotFather](https://t.me/botfather)'a `/setmenubutton` komutunu gönderin
+2. Botunuzu seçin
+3. Web App URL'sini girin: `https://your-domain.com/index.html`
+
+### 3. Proje Kurulumu
+
 ```bash
-git clone https://github.com/kullaniciadi/TmStars.git
-cd TmStars
+# Bağımlılıkları yükleyin
+npm install
+
+# Bot token'ını ayarlayın
+# server.js dosyasında YOUR_BOT_TOKEN_HERE yerine gerçek token'ınızı yazın
 ```
 
-2. Dosyaları web sunucusunda çalıştırın:
+### 4. MongoDB Kurulumu
+
+1. [MongoDB Atlas](https://cloud.mongodb.com) hesabı oluşturun
+2. Yeni cluster oluşturun (M0 ücretsiz plan)
+3. Database Access'te yeni kullanıcı oluşturun
+4. Network Access'te IP whitelist ekleyin (0.0.0.0/0)
+5. Connection string'i alın
+
+### 5. Environment Variables
+
+`.env` dosyası oluşturun:
+
+```env
+DATABASE_URL=mongodb+srv://username:password@cluster.mongodb.net/starearn
+DEBUG=true
+NODE_ENV=development
+```
+
+### 6. Web Sunucusu Kurulumu
+
+#### A) Render (Önerilen)
 ```bash
-# Python ile
-python -m http.server 8000
+# Render CLI kurun
+npm i -g render-cli
 
-# Node.js ile
-npx serve .
-
-# PHP ile
-php -S localhost:8000
+# Projeyi deploy edin
+render deploy
 ```
 
-3. Tarayıcıda açın:
-```
-http://localhost:8000
+#### B) Vercel
+```bash
+# Vercel CLI kurun
+npm i -g vercel
+
+# Projeyi deploy edin
+vercel
+
+# Domain'i ayarlayın
+vercel --prod
 ```
 
-## 📁 Proje Yapısı
+#### C) Netlify
+```bash
+# Netlify CLI kurun
+npm i -g netlify-cli
 
-```
-TmStars/
-├── index.html          # Ana HTML dosyası
-├── styles.css          # CSS stilleri
-├── script.js           # JavaScript fonksiyonları
-├── README.md           # Proje dokümantasyonu
-└── .gitignore          # Git ignore dosyası
+# Projeyi deploy edin
+netlify deploy
 ```
 
-## 🎮 Kullanım
+### 7. Bot Token'ını Güncelleme
+
+`server.js` dosyasında:
+```javascript
+const token = 'YOUR_BOT_TOKEN_HERE'; // Buraya gerçek token'ınızı yazın
+```
+
+### 8. Web App URL'sini Güncelleme
+
+`server.js` dosyasında:
+```javascript
+const WEB_APP_URL = 'https://your-domain.com/index.html'; // Buraya gerçek URL'nizi yazın
+```
+
+## 🛠️ Teknolojiler
+
+- **Frontend:** HTML5, CSS3, JavaScript (ES6+)
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB
+- **Telegram API:** Telegram Web App SDK, node-telegram-bot-api
+- **Hosting:** Render.com
+- **Güvenlik:** HMAC-SHA256 doğrulaması
+
+## 🔧 API Endpoints
 
 ### Kullanıcı İşlemleri
-1. **Günlük Bonus Al** - Her gün bir kez 50 yıldız
-2. **Reklam İzle** - 3 saniye reklam izleyerek 5 yıldız kazan
-3. **Görevleri Tamamla** - Günlük görevlerle ekstra yıldız kazan
-4. **Arkadaş Davet Et** - Davet linkini paylaşarak 20 yıldız kazan
-5. **Yıldız Çek** - Minimum 100 yıldız ile çekim talebi oluştur
+- `GET /api/users/profile/:userId` - Kullanıcı profili getir
+- `PUT /api/users/profile/:userId` - Kullanıcı profili güncelle
+- `POST /api/users/watch-ad` - Reklam izleme
+- `POST /api/users/withdraw` - Yıldız çekme
 
-### Görev Sistemi
-- **Giriş Yap** - 10 yıldız
-- **3 Reklam İzle** - 15 yıldız
-- **Arkadaş Davet Et** - 25 yıldız
-- **Günlük Bonus Al** - 20 yıldız
+### Liderlik Tablosu
+- `GET /api/leaderboard/:period` - Liderlik tablosu (daily/weekly/monthly)
 
-## 🔧 Telegram Mini App Kurulumu
+### İstatistikler
+- `GET /api/stats` - Genel istatistikler
 
-### 1. BotFather ile Bot Oluşturma
-1. Telegram'da @BotFather'a mesaj gönderin
-2. `/newbot` komutunu kullanın
-3. Bot adı ve kullanıcı adı belirleyin
-4. Bot token'ını kaydedin
-
-### 2. Mini App Oluşturma
-1. @BotFather'a `/newapp` komutunu gönderin
-2. Bot'unuzu seçin
-3. Mini app adı ve açıklaması girin
-4. Web App URL'sini girin (canlı sunucu adresi)
-
-### 3. Web App URL Formatı
-```
-https://yourdomain.com/tmstars/
-```
-
-## 🌐 Canlıya Alma
-
-### 1. Hosting Seçenekleri
-- **GitHub Pages** - Ücretsiz hosting
-- **Netlify** - Otomatik deployment
-- **Vercel** - Hızlı deployment
-- **Heroku** - Ücretli hosting
-- **VPS** - Kendi sunucunuz
-
-### 2. GitHub Pages ile Deployment
-1. GitHub'da repository oluşturun
-2. Dosyaları yükleyin
-3. Settings > Pages > Source: Deploy from branch
-4. Branch: main, folder: / (root)
-5. URL'yi kopyalayın
-
-### 3. Netlify ile Deployment
-1. Netlify hesabı oluşturun
-2. "New site from Git" seçin
-3. GitHub repository'nizi bağlayın
-4. Deploy butonuna tıklayın
-5. URL'yi kopyalayın
-
-## 📊 Veri Yönetimi
-
-### LocalStorage Yapısı
-```javascript
-{
-  "stars": 150,
-  "dailyBonusClaimed": false,
-  "lastDailyBonus": "Mon Dec 18 2023",
-  "completedTasks": ["login", "daily_bonus"],
-  "withdrawalHistory": [
-    {
-      "id": 1703123456789,
-      "amount": 100,
-      "note": "Test çekim",
-      "status": "pending",
-      "date": "2023-12-18T10:30:56.789Z"
-    }
-  ]
-}
-```
-
-## 🎨 Özelleştirme
-
-### Renk Teması Değiştirme
-`styles.css` dosyasında CSS değişkenlerini düzenleyin:
-
-```css
-:root {
-  --primary-color: #667eea;
-  --secondary-color: #764ba2;
-  --accent-color: #ffd700;
-  --success-color: #28a745;
-  --error-color: #dc3545;
-}
-```
-
-### Yıldız Miktarlarını Değiştirme
-`script.js` dosyasında değerleri güncelleyin:
-
-```javascript
-const DAILY_BONUS = 50;
-const AD_REWARD = 5;
-const INVITE_REWARD = 20;
-const MIN_WITHDRAWAL = 100;
-```
+### Admin İşlemleri
+- `GET /api/admin/users` - Kullanıcı listesi
+- `GET /api/admin/withdrawals` - Çekim listesi
+- `PUT /api/admin/withdrawals/:id` - Çekim durumu güncelle
 
 ## 🔒 Güvenlik
 
-### Öneriler
-- HTTPS kullanın
-- Input validasyonu yapın
-- XSS koruması ekleyin
-- Rate limiting uygulayın
-- Backend API kullanın
+- Web App sadece Telegram'dan açıldığında çalışır
+- HMAC doğrulaması ile güvenlik sağlanır
+- HTTPS zorunluluğu
+- XSS ve CSRF koruması
+- Rate limiting (gelecek sürümde)
 
-### Backend Entegrasyonu
-Gerçek bir uygulama için:
-- Node.js/Express backend
-- MongoDB/PostgreSQL veritabanı
-- JWT authentication
-- API rate limiting
-- Admin paneli
+## 📊 Veritabanı Yapısı
 
-## 📈 Gelecek Özellikler
+### Users Collection
+```javascript
+{
+  telegramId: String,
+  username: String,
+  firstName: String,
+  lastName: String,
+  stars: Number,
+  level: String,
+  experience: Number,
+  dailyAdsWatched: Number,
+  lastAdDate: Date,
+  totalEarnings: Number,
+  withdrawalHistory: Array,
+  tasks: Object,
+  consecutiveLogins: Number,
+  lastLoginDate: Date,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
 
-### Planlanan Özellikler
-- [ ] Gerçek reklam entegrasyonu
-- [ ] Sosyal medya paylaşımı
-- [ ] Seviye sistemi
-- [ ] Başarım rozetleri
-- [ ] Turnuva sistemi
-- [ ] Gerçek para çekimi
-- [ ] Push bildirimleri
-- [ ] Çoklu dil desteği
+### Withdrawals Collection
+```javascript
+{
+  userId: String,
+  amount: Number,
+  method: String,
+  phoneNumber: String,
+  status: String,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
 
-### Teknik İyileştirmeler
-- [ ] Service Worker (PWA)
-- [ ] IndexedDB kullanımı
-- [ ] WebSocket entegrasyonu
-- [ ] Progressive loading
-- [ ] Offline desteği
+### Stats Collection
+```javascript
+{
+  totalUsers: Number,
+  totalStarsEarned: Number,
+  totalWithdrawals: Number,
+  totalAdsWatched: Number,
+  lastUpdated: Date
+}
+```
 
-## 🤝 Katkıda Bulunma
+## 📱 Kullanım
 
-1. Fork yapın
-2. Feature branch oluşturun (`git checkout -b feature/AmazingFeature`)
-3. Commit yapın (`git commit -m 'Add some AmazingFeature'`)
-4. Push yapın (`git push origin feature/AmazingFeature`)
-5. Pull Request oluşturun
+1. Telegram'da botunuzu bulun
+2. `/start` komutunu gönderin
+3. "StarEarn'a Git" butonuna tıklayın
+4. Reklam izleyerek yıldız kazanın
+5. Görevleri tamamlayarak bonus yıldızlar kazanın
+6. Yıldızlarınızı çekin
 
-## 📝 Lisans
+## 🔧 Yapılandırma
 
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakın.
+### Admin Ayarları
+`server.js` dosyasında admin chat ID'sini ayarlayın:
+```javascript
+if (!collectionNames.includes('admins')) {
+    await db.createCollection('admins');
+    const admin = await db.collection('admins').findOne({ chatId: YOUR_CHAT_ID });
+    if (!admin) {
+        await db.collection('admins').insertOne({ chatId: YOUR_CHAT_ID, addedAt: new Date() });
+    }
+}
+```
 
-## 📞 İletişim
+### Özel Günler
+Admin panelinden özel günleri belirleyebilirsiniz:
+```javascript
+const specialDays = [
+    '2024-01-01', // Yılbaşı
+    '2024-05-01', // İşçi Bayramı
+    '2024-10-29'  // Cumhuriyet Bayramı
+];
+```
 
-- **Proje Linki:** [https://github.com/kullaniciadi/TmStars](https://github.com/kullaniciadi/TmStars)
-- **Telegram:** [@kullaniciadi](https://t.me/kullaniciadi)
-- **Email:** kullanici@email.com
+## 📄 Lisans
+
+MIT License
+
+## 📞 Destek
+
+Sorunlarınız için:
+- GitHub Issues
+- Telegram: @your_support_username
+- Email: support@yourdomain.com
 
 ## 🙏 Teşekkürler
 
 - Telegram Web App API
 - Font Awesome ikonları
-- Modern CSS teknikleri
-- Açık kaynak topluluğu
+- MongoDB Atlas
+- Render.com hosting
+
+---
+
+**Not**: Bu Web App eğitim amaçlıdır. Gerçek para kazanma uygulamaları için gerekli lisansları almayı unutmayın.
+
+## 🚀 Gelecek Özellikler
+
+- [ ] Gerçek reklam entegrasyonu (AdMob, Facebook Ads)
+- [ ] Arkadaş davet sistemi
+- [ ] Özel etkinlikler yönetimi
+- [ ] Push bildirimleri
+- [ ] Çoklu dil desteği
+- [ ] Gelişmiş analitikler
+- [ ] Otomatik ödeme sistemi
+- [ ] Referans sistemi
+- [ ] Başarım rozetleri
+- [ ] Haftalık yarışmalar
 
 ---
 
