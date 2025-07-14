@@ -821,3 +821,25 @@ function addLevelInfoBtnListener() {
         btn.onclick = openLevelModal;
     });
 } 
+
+function showSection(sectionName) {
+    // Tüm ana section'ları gizle
+    document.querySelectorAll('.main-content > section').forEach(sec => sec.style.display = 'none');
+    // İlgili section'ı göster
+    const sec = document.getElementById(sectionName + '-section');
+    if (sec) sec.style.display = 'block';
+    // Ekstra: Profil gösteriliyorsa profil bilgilerini doldur
+    if (sectionName === 'profile') showProfileSection();
+}
+// Alt menüdeki tüm sekmelere event ekle
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const section = this.getAttribute('data-section');
+            showSection(section);
+        });
+    });
+    // Sayfa ilk açıldığında ana sayfa section'ı göster
+    showSection('home');
+}); 
