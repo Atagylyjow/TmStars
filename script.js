@@ -305,69 +305,49 @@ async function watchAd() {
         showMessage('Günlük reklam limitiniz doldu!', 'error');
         return;
     }
-    
     const watchAdBtn = document.getElementById('watch-ad-btn');
     const progressContainer = document.getElementById('progress-container');
     const progressFill = document.getElementById('progress-fill');
     const progressText = document.getElementById('progress-text');
-    
-    // Disable button and show progress
+
+    // Butonu devre dışı bırak ve yükleniyor göster
     watchAdBtn.disabled = true;
-    watchAdBtn.innerHTML = '<i class="fas fa-clock"></i> Reklam İzleniyor...';
-    progressContainer.style.display = 'block';
-    
-    // Simulate ad watching (15 seconds)
-    const adDuration = 15000; // 15 seconds
-    const updateInterval = 100; // Update every 100ms
-    const totalUpdates = adDuration / updateInterval;
-    let currentUpdate = 0;
-    
-    const progressInterval = setInterval(() => {
-        currentUpdate++;
-        const progress = (currentUpdate / totalUpdates) * 100;
-        
-        progressFill.style.width = `${progress}%`;
-        progressText.textContent = `${Math.round(progress)}%`;
-        
-        if (currentUpdate >= totalUpdates) {
-            clearInterval(progressInterval);
-            
-            // Ad completed
-            if (!userData.totalAdsWatched) userData.totalAdsWatched = 0;
-            userData.totalAdsWatched++;
-            updateUserLevel();
-            const multiplier = LEVELS[userData.level - 1].multiplier;
-            const earned = 0.10 * multiplier;
-            userData.stars += earned;
-            userData.dailyAdsWatched++;
-            userData.totalEarnings += earned;
-            userData.tasks.watchAds.completed++;
-            
-            // Update level
-            updateUserLevel();
-            
-            // Save data
-            saveUserData();
-            
-            // Update UI
-            updateUI();
-            
-            // Show success message
-            showMessage(`+${earned.toFixed(2)} yıldız kazandınız!`, 'success');
-            
-            // Reset button and hide progress
-            watchAdBtn.disabled = false;
-            watchAdBtn.innerHTML = '<i class="fas fa-play"></i> Reklam İzle';
-            progressContainer.style.display = 'none';
-            progressFill.style.width = '0%';
-            progressText.textContent = '0%';
-            
-            // Add star earned animation
-            const starDisplay = document.getElementById('user-stars');
-            starDisplay.classList.add('star-earned');
-            setTimeout(() => starDisplay.classList.remove('star-earned'), 500);
-        }
-    }, updateInterval);
+    watchAdBtn.innerHTML = '<i class="fas fa-clock"></i> Reklam Yükleniyor...';
+    progressContainer.style.display = 'none';
+
+    // Reklamı göster
+    show_9569626().then(() => {
+        // Reklam başarıyla izlendi, ödül ver
+        if (!userData.totalAdsWatched) userData.totalAdsWatched = 0;
+        userData.totalAdsWatched++;
+        updateUserLevel();
+        const multiplier = LEVELS[userData.level - 1].multiplier;
+        const earned = 0.10 * multiplier;
+        userData.stars += earned;
+        userData.dailyAdsWatched++;
+        userData.totalEarnings += earned;
+        userData.tasks.watchAds.completed++;
+        // Update level
+        updateUserLevel();
+        // Save data
+        saveUserData();
+        // Update UI
+        updateUI();
+        // Show success message
+        showMessage(`+${earned.toFixed(2)} yıldız kazandınız!`, 'success');
+        // Reset button
+        watchAdBtn.disabled = false;
+        watchAdBtn.innerHTML = '<i class="fas fa-play"></i> Reklam İzle';
+        // Yıldız animasyonu
+        const starDisplay = document.getElementById('user-stars');
+        starDisplay.classList.add('star-earned');
+        setTimeout(() => starDisplay.classList.remove('star-earned'), 500);
+    }).catch(() => {
+        // Reklam izlenmeden kapatıldı veya hata oluştu
+        showMessage('Reklam izlenmeden kapatıldı.', 'error');
+        watchAdBtn.disabled = false;
+        watchAdBtn.innerHTML = '<i class="fas fa-play"></i> Reklam İzle';
+    });
 }
 
 // Update task progress
