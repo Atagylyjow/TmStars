@@ -291,7 +291,7 @@ async function watchAd() {
     progressContainer.style.display = 'none';
 
     // Reklamı göster
-    show_9569626().then(() => {
+    show_9499819().then(() => {
         // Reklam başarıyla izlendi, ödül ver
         if (!userData.totalAdsWatched) userData.totalAdsWatched = 0;
         userData.totalAdsWatched++;
@@ -780,6 +780,8 @@ function addLevelInfoBtnListener() {
 } 
 
 async function showSection(sectionName) {
+    // Kullanıcı bilgilerini ve header'ı güncelle
+    initializeApp();
     // Tüm ana section'ları gizle
     document.querySelectorAll('.main-content > section').forEach(sec => sec.style.display = 'none');
     // İlgili section'ı göster
