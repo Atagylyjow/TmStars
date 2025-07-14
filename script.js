@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             closeProfileModal();
         }
     });
+    addLevelInfoBtnListener(); // Sayfa yüklendiğinde ve profil section gösterildiğinde çağır
 });
 
 // Initialize app
@@ -804,6 +805,7 @@ function showProfileSection() {
     };
     document.getElementById('profile-ref-count').textContent = user.refCount || 0;
     document.getElementById('profile-ref-stars').textContent = user.refStars ? user.refStars.toFixed(2) : '0.00';
+    addLevelInfoBtnListener(); // Her profil gösteriminde tekrar ekle
 }
 // Alt menüdeki profil sekmesine tıklanınca showProfileSection çağrılacak.
 document.addEventListener('DOMContentLoaded', function() {
@@ -812,3 +814,10 @@ document.addEventListener('DOMContentLoaded', function() {
         profileNavBtn.addEventListener('click', showProfileSection);
     }
 }); 
+
+function addLevelInfoBtnListener() {
+    // Birden fazla buton varsa hepsine ekle
+    document.querySelectorAll('#level-info-btn').forEach(btn => {
+        btn.onclick = openLevelModal;
+    });
+} 
