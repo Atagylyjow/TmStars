@@ -20,16 +20,23 @@ let userData = {
         dailyLogin: { completed: 0, target: 7, reward: 5.00, claimed: false }
     },
     consecutiveLogins: 0,
-    lastLoginDate: null
+    lastLoginDate: null,
+    totalAdsWatched: 0 // Added for total watched ads
 };
 
-// Level system configuration
-const LEVELS = {
-    'Bronze': { min: 0, max: 100, multiplier: 1.0 },
-    'Silver': { min: 101, max: 250, multiplier: 1.2 },
-    'Gold': { min: 251, max: 500, multiplier: 1.5 },
-    'Platinum': { min: 501, max: Infinity, multiplier: 2.0 }
-};
+// Level system configuration (total watched ads based)
+const LEVELS = [
+    { min: 0, max: 49, multiplier: 1.0 },      // 1. Seviye
+    { min: 50, max: 99, multiplier: 1.1 },     // 2. Seviye
+    { min: 100, max: 199, multiplier: 1.2 },   // 3. Seviye
+    { min: 200, max: 349, multiplier: 1.3 },   // 4. Seviye
+    { min: 350, max: 499, multiplier: 1.4 },   // 5. Seviye
+    { min: 500, max: 699, multiplier: 1.5 },   // 6. Seviye
+    { min: 700, max: 899, multiplier: 1.6 },   // 7. Seviye
+    { min: 900, max: 1199, multiplier: 1.7 },  // 8. Seviye
+    { min: 1200, max: 1499, multiplier: 1.8 }, // 9. Seviye
+    { min: 1500, max: Infinity, multiplier: 2.0 } // 10. Seviye
+];
 
 // API Configuration
 const API_BASE_URL = 'http://localhost:3000/api';
@@ -174,7 +181,8 @@ async function saveUserData() {
                     totalEarnings: userData.totalEarnings,
                     tasks: userData.tasks,
                     consecutiveLogins: userData.consecutiveLogins,
-                    lastLoginDate: userData.lastLoginDate
+                    lastLoginDate: userData.lastLoginDate,
+                    totalAdsWatched: userData.totalAdsWatched
                 })
             });
             
@@ -192,7 +200,7 @@ async function saveUserData() {
 // Update UI with current data
 function updateUI() {
     document.getElementById('user-stars').textContent = userData.stars.toFixed(2);
-    document.getElementById('user-level').textContent = userData.level;
+    document.getElementById('user-level').textContent = userData.level + '. Seviye';
     document.getElementById('ads-watched-today').textContent = userData.dailyAdsWatched;
     document.getElementById('ads-limit').textContent = '50';
     
@@ -257,17 +265,15 @@ function checkConsecutiveLogin() {
 
 // Update user level based on stars
 function updateUserLevel() {
-    const stars = userData.stars;
-    
-    if (stars >= 501) {
-        userData.level = 'Platinum';
-    } else if (stars >= 251) {
-        userData.level = 'Gold';
-    } else if (stars >= 101) {
-        userData.level = 'Silver';
-    } else {
-        userData.level = 'Bronze';
+    let level = 1;
+    let watched = userData.totalAdsWatched || 0;
+    for (let i = LEVELS.length - 1; i >= 0; i--) {
+        if (watched >= LEVELS[i].min) {
+            level = i + 1;
+            break;
+        }
     }
+    userData.level = level;
 }
 
 // Watch ad function
@@ -304,13 +310,14 @@ async function watchAd() {
             clearInterval(progressInterval);
             
             // Ad completed
-            const baseReward = 0.10;
-            const levelMultiplier = LEVELS[userData.level].multiplier;
-            const reward = baseReward * levelMultiplier;
-            
-            userData.stars += reward;
+            if (!userData.totalAdsWatched) userData.totalAdsWatched = 0;
+            userData.totalAdsWatched++;
+            updateUserLevel();
+            const multiplier = LEVELS[userData.level - 1].multiplier;
+            const earned = 0.10 * multiplier;
+            userData.stars += earned;
             userData.dailyAdsWatched++;
-            userData.totalEarnings += reward;
+            userData.totalEarnings += earned;
             userData.tasks.watchAds.completed++;
             
             // Update level
@@ -323,7 +330,7 @@ async function watchAd() {
             updateUI();
             
             // Show success message
-            showMessage(`+${reward.toFixed(2)} yıldız kazandınız!`, 'success');
+            showMessage(`+${earned.toFixed(2)} yıldız kazandınız!`, 'success');
             
             // Reset button and hide progress
             watchAdBtn.disabled = false;
