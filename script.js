@@ -780,19 +780,27 @@ function showProfileSection() {
         photoUrl = window.Telegram.WebApp.initDataUnsafe.user.photo_url;
     }
     document.getElementById('profile-photo').src = photoUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.firstName || user.username || 'Kullanıcı');
-    document.getElementById('profile-username').textContent = user.firstName || user.username || 'Kullanıcı';
-    document.getElementById('profile-id').textContent = 'ID: ' + (user.userId || '-');
-    document.getElementById('profile-level').textContent = user.level + '. Seviye';
-    document.getElementById('profile-multiplier').textContent = (LEVELS[user.level-1].multiplier || 1).toFixed(2) + 'x';
+    document.getElementById('profile-username').textContent = user.firstName || user.username || 'Unconnected';
+    document.getElementById('profile-id').textContent = 'ID: ' + (user.userId || user.telegramId || '-');
+    // Seviye ve çarpan
+    let levelNum = user.level || 1;
+    if (typeof levelNum === 'string' && !isNaN(parseInt(levelNum))) levelNum = parseInt(levelNum);
+    document.getElementById('profile-level').textContent = (levelNum) + '. Seviye';
+    document.getElementById('profile-multiplier').textContent = (LEVELS[levelNum-1]?.multiplier || 1).toFixed(2) + 'x';
+    // İstatistikler
     document.getElementById('profile-total-ads').textContent = user.totalAdsWatched || 0;
     document.getElementById('profile-total-stars').textContent = user.stars ? user.stars.toFixed(2) : '0.00';
-    document.getElementById('profile-join-date').textContent = user.joinDate ? new Date(user.joinDate).toLocaleDateString('tr-TR') : '-';
+    let joinDate = user.joinDate || user.createdAt;
+    document.getElementById('profile-join-date').textContent = joinDate ? new Date(joinDate).toLocaleDateString('tr-TR') : '-';
     // Davet linki ve istatistikler
-    const refLink = `${window.location.origin}/?ref=${user.userId}`;
+    const refId = user.userId || user.telegramId || '-';
+    const refLink = refId !== '-' ? `${window.location.origin}/?ref=${refId}` : '-';
     document.getElementById('profile-ref-link').textContent = refLink;
     document.getElementById('copy-ref-link').onclick = function() {
-        navigator.clipboard.writeText(refLink);
-        showMessage('Davet linki kopyalandı!', 'success');
+        if (refLink && refLink !== '-') {
+            navigator.clipboard.writeText(refLink);
+            showMessage('Davet linki kopyalandı!', 'success');
+        }
     };
     document.getElementById('profile-ref-count').textContent = user.refCount || 0;
     document.getElementById('profile-ref-stars').textContent = user.refStars ? user.refStars.toFixed(2) : '0.00';
