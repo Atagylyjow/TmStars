@@ -270,9 +270,8 @@ function calculateLevel(stars) {
 app.get('/api/users/profile/:userId', async (req, res) => {
     try {
         const userId = normalizeUserId(req.params.userId);
-        
+        const refBy = req.query.ref || req.body.refBy || null;
         let user = await db.collection('users').findOne({ telegramId: userId });
-        
         if (!user) {
             // Yeni kullanıcı oluştur
             user = {
@@ -295,20 +294,30 @@ app.get('/api/users/profile/:userId', async (req, res) => {
                 consecutiveLogins: 0,
                 lastLoginDate: null,
                 createdAt: new Date(),
-                updatedAt: new Date()
+                updatedAt: new Date(),
+                refBy: refBy,
+                refCount: 0,
+                refStars: 0
             };
-            
             await db.collection('users').insertOne(user);
             await updateStats('totalUsers');
-            
             log('info', 'Yeni kullanıcı oluşturuldu', { userId });
+            // Referral ödülü
+            if (refBy) {
+                const refUser = await db.collection('users').findOne({ telegramId: refBy });
+                if (refUser) {
+                    await db.collection('users').updateOne(
+                        { telegramId: refBy },
+                        { $inc: { stars: 1, refCount: 1, refStars: 1 }, $set: { updatedAt: new Date() } }
+                    );
+                    log('info', 'Referral ödülü verildi', { refBy, to: userId });
+                }
+            }
         }
-        
         res.json({
             success: true,
             user: user
         });
-        
     } catch (error) {
         log('error', 'Kullanıcı profili getirme hatası', { error: error.message, userId: req.params.userId });
         res.status(500).json({
