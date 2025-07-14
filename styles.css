@@ -874,3 +874,65 @@ body {
     color: var(--secondary-blue);
     font-weight: 600;
 } 
+
+.profile-btn {
+    background: none;
+    border: none;
+    margin-left: 0.7rem;
+    cursor: pointer;
+    color: var(--secondary-blue);
+    font-size: 1.5rem;
+    transition: transform 0.2s;
+    vertical-align: middle;
+}
+.profile-btn:hover {
+    transform: scale(1.12);
+    color: var(--primary-gold);
+}
+
+.profile-modal-content {
+    max-width: 400px;
+    margin: 2rem auto;
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 2rem 1.2rem 1.2rem 1.2rem;
+    box-shadow: var(--shadow);
+    position: relative;
+    text-align: center;
+}
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 1.2rem;
+    justify-content: center;
+}
+.profile-photo {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-gold);
+    background: var(--bg-secondary);
+}
+.profile-main-info {
+    text-align: left;
+}
+.profile-username {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--secondary-blue);
+}
+.profile-id {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+.profile-details {
+    margin-top: 0.5rem;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+} 

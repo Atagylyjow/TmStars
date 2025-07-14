@@ -57,6 +57,14 @@ document.addEventListener('DOMContentLoaded', async function() {
             closeLevelModal();
         }
     });
+    // Profil modalı eventleri
+    document.getElementById('profile-btn').addEventListener('click', openProfileModal);
+    document.getElementById('profile-modal-close').addEventListener('click', closeProfileModal);
+    window.addEventListener('click', function(event) {
+        if (event.target === document.getElementById('profile-modal')) {
+            closeProfileModal();
+        }
+    });
 });
 
 // Initialize app
@@ -751,4 +759,26 @@ function openLevelModal() {
 }
 function closeLevelModal() {
     document.getElementById('level-modal').style.display = 'none';
+} 
+
+function openProfileModal() {
+    // Kullanıcı bilgileri
+    const user = userData;
+    // Profil fotoğrafı (Telegram'dan alınabiliyorsa)
+    let photoUrl = '';
+    if (window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.photo_url) {
+        photoUrl = window.Telegram.WebApp.initDataUnsafe.user.photo_url;
+    }
+    document.getElementById('profile-photo').src = photoUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.firstName || user.username || 'Kullanıcı');
+    document.getElementById('profile-username').textContent = user.firstName || user.username || 'Kullanıcı';
+    document.getElementById('profile-id').textContent = 'ID: ' + (user.userId || '-');
+    document.getElementById('profile-level').textContent = user.level + '. Seviye';
+    document.getElementById('profile-multiplier').textContent = (LEVELS[user.level-1].multiplier || 1).toFixed(2) + 'x';
+    document.getElementById('profile-total-ads').textContent = user.totalAdsWatched || 0;
+    document.getElementById('profile-total-stars').textContent = user.stars ? user.stars.toFixed(2) : '0.00';
+    document.getElementById('profile-join-date').textContent = user.joinDate ? new Date(user.joinDate).toLocaleDateString('tr-TR') : '-';
+    document.getElementById('profile-modal').style.display = 'block';
+}
+function closeProfileModal() {
+    document.getElementById('profile-modal').style.display = 'none';
 } 

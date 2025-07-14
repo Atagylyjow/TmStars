@@ -31,6 +31,7 @@
                         <button class="level-info-btn" id="level-info-btn" title="Seviye Bilgisi"><i class="fas fa-medal"></i></button>
                     </div>
                 </div>
+                <button class="profile-btn" id="profile-btn" title="Profil"><i class="fas fa-user-circle"></i></button>
                 <div class="theme-toggle" id="theme-toggle"></div>
             </div>
         </header>
@@ -275,6 +276,27 @@
               <tbody id="level-table-body"></tbody>
             </table>
             <div id="level-modal-next-info" class="level-next-info"></div>
+          </div>
+        </div>
+
+        <!-- Profil Modalı -->
+        <div class="modal" id="profile-modal">
+          <div class="modal-content profile-modal-content">
+            <span class="modal-close" id="profile-modal-close">&times;</span>
+            <div class="profile-header">
+              <img id="profile-photo" class="profile-photo" src="" alt="Profil Fotoğrafı" />
+              <div class="profile-main-info">
+                <div class="profile-username" id="profile-username"></div>
+                <div class="profile-id" id="profile-id"></div>
+              </div>
+            </div>
+            <div class="profile-details">
+              <div><b>Seviye:</b> <span id="profile-level"></span> <b>Çarpan:</b> <span id="profile-multiplier"></span></div>
+              <div><b>Toplam İzlenen Reklam:</b> <span id="profile-total-ads"></span></div>
+              <div><b>Toplam Yıldız:</b> <span id="profile-total-stars"></span></div>
+              <div><b>Kayıt Tarihi:</b> <span id="profile-join-date"></span></div>
+            </div>
+            <!-- Diğer modüller buraya eklenecek -->
           </div>
         </div>
     </div>
