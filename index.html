@@ -31,7 +31,6 @@
                         <button class="level-info-btn" id="level-info-btn" title="Seviye Bilgisi"><i class="fas fa-medal"></i></button>
                     </div>
                 </div>
-                <button class="profile-btn" id="profile-btn" title="Profil"><i class="fas fa-user-circle"></i></button>
                 <div class="theme-toggle" id="theme-toggle"></div>
             </div>
         </header>
@@ -207,8 +206,12 @@
                 <i class="fas fa-wallet"></i>
                 <span>Çekme</span>
             </button>
-            <button class="nav-btn" data-section="profile">
-                <i class="fas fa-user"></i>
+            <button class="nav-btn" data-section="leaderboard">
+                <i class="fas fa-trophy"></i>
+                <span>Liderlik</span>
+            </button>
+            <button class="nav-btn" data-section="profile" id="profile-nav-btn">
+                <i class="fas fa-user-circle"></i>
                 <span>Profil</span>
             </button>
         </nav>
@@ -295,6 +298,11 @@
               <div><b>Toplam İzlenen Reklam:</b> <span id="profile-total-ads"></span></div>
               <div><b>Toplam Yıldız:</b> <span id="profile-total-stars"></span></div>
               <div><b>Kayıt Tarihi:</b> <span id="profile-join-date"></span></div>
+            </div>
+            <div class="profile-referral">
+              <div><b>Davet Linkin:</b> <span id="profile-ref-link"></span> <button id="copy-ref-link" title="Kopyala"><i class="fas fa-copy"></i></button></div>
+              <div><b>Davet Ettiğin Kullanıcılar:</b> <span id="profile-ref-count">0</span></div>
+              <div><b>Referansla Kazanılan Yıldız:</b> <span id="profile-ref-stars">0.00</span></div>
             </div>
             <!-- Diğer modüller buraya eklenecek -->
           </div>

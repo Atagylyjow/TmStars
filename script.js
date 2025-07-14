@@ -50,15 +50,21 @@ document.addEventListener('DOMContentLoaded', async function() {
     updateUI();
     await loadLeaderboard();
     // Seviye modalı eventleri
-    document.getElementById('level-info-btn').addEventListener('click', openLevelModal);
+    const levelInfoBtn = document.getElementById('level-info-btn');
+    if (levelInfoBtn) {
+        levelInfoBtn.addEventListener('click', openLevelModal);
+    }
     document.getElementById('level-modal-close').addEventListener('click', closeLevelModal);
     window.addEventListener('click', function(event) {
         if (event.target === document.getElementById('level-modal')) {
             closeLevelModal();
         }
     });
-    // Profil modalı eventleri
-    document.getElementById('profile-btn').addEventListener('click', openProfileModal);
+    // Alt menüdeki profil sekmesi
+    const profileNavBtn = document.getElementById('profile-nav-btn');
+    if (profileNavBtn) {
+        profileNavBtn.addEventListener('click', openProfileModal);
+    }
     document.getElementById('profile-modal-close').addEventListener('click', closeProfileModal);
     window.addEventListener('click', function(event) {
         if (event.target === document.getElementById('profile-modal')) {
@@ -777,6 +783,15 @@ function openProfileModal() {
     document.getElementById('profile-total-ads').textContent = user.totalAdsWatched || 0;
     document.getElementById('profile-total-stars').textContent = user.stars ? user.stars.toFixed(2) : '0.00';
     document.getElementById('profile-join-date').textContent = user.joinDate ? new Date(user.joinDate).toLocaleDateString('tr-TR') : '-';
+    // Davet linki ve istatistikler
+    const refLink = `${window.location.origin}/?ref=${user.userId}`;
+    document.getElementById('profile-ref-link').textContent = refLink;
+    document.getElementById('copy-ref-link').onclick = function() {
+        navigator.clipboard.writeText(refLink);
+        showMessage('Davet linki kopyalandı!', 'success');
+    };
+    document.getElementById('profile-ref-count').textContent = user.refCount || 0;
+    document.getElementById('profile-ref-stars').textContent = user.refStars ? user.refStars.toFixed(2) : '0.00';
     document.getElementById('profile-modal').style.display = 'block';
 }
 function closeProfileModal() {
