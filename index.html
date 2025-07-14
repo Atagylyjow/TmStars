@@ -44,29 +44,128 @@
                 <h1>TmStars</h1>
                 <p>Reklam izleyerek yıldız kazanın!<br>En güncel görevler ve fırsatlar için menüyü kullanın.</p>
               </div>
+              <!-- Reklam İzle Kartı -->
+              <div class="ad-card">
+                <div class="ad-icon"><i class="fas fa-play-circle"></i></div>
+                <h2>Reklam İzle</h2>
+                <p>15 saniye reklam izleyerek 0.10 yıldız kazanın</p>
+                <div class="ad-stats">
+                  <div class="stat">
+                    <span class="stat-number" id="ads-watched-today">0</span>
+                    <span class="stat-label">Bugün İzlenen</span>
+                  </div>
+                  <div class="stat">
+                    <span class="stat-number" id="ads-limit">50</span>
+                    <span class="stat-label">Günlük Limit</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary watch-ad-btn" id="watch-ad-btn">
+                  <i class="fas fa-play"></i>
+                  Reklam İzle
+                </button>
+                <div class="progress-container" id="progress-container" style="display: none;">
+                  <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                  </div>
+                  <span class="progress-text" id="progress-text">0%</span>
+                </div>
+              </div>
             </section>
             <!-- Görevler Section -->
             <section id="tasks-section" style="display:none;">
-              <div class="section-card">
-                <h2>Günlük Görevler</h2>
-                <p>Her gün görevleri tamamlayarak ekstra yıldız kazan!</p>
-                <!-- Buraya görev listesi ve ilerleme barı eklenebilir -->
+              <h2>Günlük Görevler</h2>
+              <div class="tasks-grid">
+                <div class="task-card" data-task="watch-ads">
+                  <div class="task-icon"><i class="fas fa-eye"></i></div>
+                  <div class="task-info">
+                    <h3>10 Reklam İzle</h3>
+                    <p>0.50 bonus yıldız kazanın</p>
+                    <div class="task-progress">
+                      <div class="progress-bar">
+                        <div class="progress-fill" id="task-watch-progress"></div>
+                      </div>
+                      <span class="progress-text" id="task-watch-text">0/10</span>
+                    </div>
+                  </div>
+                  <div class="task-action">
+                    <button class="btn btn-secondary task-btn" data-task="watch-ads" disabled>
+                      <i class="fas fa-lock"></i>
+                      Kilitli
+                    </button>
+                  </div>
+                </div>
+                <div class="task-card" data-task="invite-friends">
+                  <div class="task-icon"><i class="fas fa-users"></i></div>
+                  <div class="task-info">
+                    <h3>3 Arkadaş Davet Et</h3>
+                    <p>5 bonus yıldız kazanın</p>
+                    <div class="task-progress">
+                      <div class="progress-bar">
+                        <div class="progress-fill" id="task-invite-progress"></div>
+                      </div>
+                      <span class="progress-text" id="task-invite-text">0/3</span>
+                    </div>
+                  </div>
+                  <div class="task-action">
+                    <button class="btn btn-secondary task-btn" data-task="invite-friends" disabled>
+                      <i class="fas fa-lock"></i>
+                      Kilitli
+                    </button>
+                  </div>
+                </div>
+                <div class="task-card" data-task="daily-login">
+                  <div class="task-icon"><i class="fas fa-calendar-check"></i></div>
+                  <div class="task-info">
+                    <h3>7 Gün Üst Üste Giriş</h3>
+                    <p>5 bonus yıldız kazanın</p>
+                    <div class="task-progress">
+                      <div class="progress-bar">
+                        <div class="progress-fill" id="task-login-progress"></div>
+                      </div>
+                      <span class="progress-text" id="task-login-text">0/7</span>
+                    </div>
+                  </div>
+                  <div class="task-action">
+                    <button class="btn btn-secondary task-btn" data-task="daily-login" disabled>
+                      <i class="fas fa-lock"></i>
+                      Kilitli
+                    </button>
+                  </div>
+                </div>
               </div>
             </section>
             <!-- Çekim Section -->
             <section id="withdrawal-section" style="display:none;">
-              <div class="section-card">
-                <h2>Yıldız Çekme</h2>
-                <p>Biriktirdiğin yıldızları çekmek için burayı kullanabilirsin.</p>
-                <!-- Buraya çekim formu ve geçmişi eklenebilir -->
+              <h2>Yıldız Çekme</h2>
+              <div class="withdrawal-card">
+                <div class="withdrawal-info">
+                  <h3>Minimum Çekim: 20 Yıldız</h3>
+                  <p>Yıldızlarınızı Telegram hesabınıza veya telefon numaranıza TMT olarak çekebilirsiniz</p>
+                </div>
+                <div class="withdrawal-options">
+                  <button class="btn btn-primary withdrawal-btn" data-method="telegram">
+                    <i class="fab fa-telegram"></i>
+                    Telegram'a Gönder
+                  </button>
+                  <button class="btn btn-secondary withdrawal-btn" data-method="phone">
+                    <i class="fas fa-phone"></i>
+                    Telefon Numarasına TMT
+                  </button>
+                </div>
               </div>
             </section>
             <!-- Liderlik Section -->
             <section id="leaderboard-section" style="display:none;">
-              <div class="section-card">
-                <h2>Liderlik Tablosu</h2>
-                <p>En çok yıldız kazananlar burada listelenir.</p>
-                <!-- Buraya liderlik tablosu eklenebilir -->
+              <h2>Liderlik Tablosu</h2>
+              <div class="leaderboard-card">
+                <div class="leaderboard-tabs">
+                  <button class="tab-btn active" data-tab="daily">Günlük</button>
+                  <button class="tab-btn" data-tab="weekly">Haftalık</button>
+                  <button class="tab-btn" data-tab="monthly">Aylık</button>
+                </div>
+                <div class="leaderboard-list" id="leaderboard-list">
+                  <!-- Leaderboard items will be loaded here -->
+                </div>
               </div>
             </section>
             <!-- Profil Section (zaten mevcut) -->
