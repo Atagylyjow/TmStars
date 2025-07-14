@@ -1,0 +1,13 @@
+name: Render Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  nothing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Just a dummy step for Render deploy
+        run: echo "Triggering Render deploy..." 
