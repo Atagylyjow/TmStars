@@ -190,6 +190,30 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Profil Section (modal değil, ana içerikte) -->
+            <section class="profile-section" id="profile-section" style="display:none;">
+              <div class="profile-card">
+                <div class="profile-header">
+                  <img id="profile-photo" class="profile-photo" src="" alt="Profil Fotoğrafı" />
+                  <div class="profile-main-info">
+                    <div class="profile-username" id="profile-username"></div>
+                    <div class="profile-id" id="profile-id"></div>
+                  </div>
+                </div>
+                <div class="profile-details">
+                  <div><b>Seviye:</b> <span id="profile-level"></span> <b>Çarpan:</b> <span id="profile-multiplier"></span></div>
+                  <div><b>Toplam İzlenen Reklam:</b> <span id="profile-total-ads"></span></div>
+                  <div><b>Toplam Yıldız:</b> <span id="profile-total-stars"></span></div>
+                  <div><b>Kayıt Tarihi:</b> <span id="profile-join-date"></span></div>
+                </div>
+                <div class="profile-referral">
+                  <div><b>Davet Linkin:</b> <span id="profile-ref-link"></span> <button id="copy-ref-link" title="Kopyala"><i class="fas fa-copy"></i></button></div>
+                  <div><b>Davet Ettiğin Kullanıcılar:</b> <span id="profile-ref-count">0</span></div>
+                  <div><b>Referansla Kazanılan Yıldız:</b> <span id="profile-ref-stars">0.00</span></div>
+                </div>
+              </div>
+            </section>
         </main>
 
         <!-- Navigation -->
@@ -279,32 +303,6 @@
               <tbody id="level-table-body"></tbody>
             </table>
             <div id="level-modal-next-info" class="level-next-info"></div>
-          </div>
-        </div>
-
-        <!-- Profil Modalı -->
-        <div class="modal" id="profile-modal">
-          <div class="modal-content profile-modal-content">
-            <span class="modal-close" id="profile-modal-close">&times;</span>
-            <div class="profile-header">
-              <img id="profile-photo" class="profile-photo" src="" alt="Profil Fotoğrafı" />
-              <div class="profile-main-info">
-                <div class="profile-username" id="profile-username"></div>
-                <div class="profile-id" id="profile-id"></div>
-              </div>
-            </div>
-            <div class="profile-details">
-              <div><b>Seviye:</b> <span id="profile-level"></span> <b>Çarpan:</b> <span id="profile-multiplier"></span></div>
-              <div><b>Toplam İzlenen Reklam:</b> <span id="profile-total-ads"></span></div>
-              <div><b>Toplam Yıldız:</b> <span id="profile-total-stars"></span></div>
-              <div><b>Kayıt Tarihi:</b> <span id="profile-join-date"></span></div>
-            </div>
-            <div class="profile-referral">
-              <div><b>Davet Linkin:</b> <span id="profile-ref-link"></span> <button id="copy-ref-link" title="Kopyala"><i class="fas fa-copy"></i></button></div>
-              <div><b>Davet Ettiğin Kullanıcılar:</b> <span id="profile-ref-count">0</span></div>
-              <div><b>Referansla Kazanılan Yıldız:</b> <span id="profile-ref-stars">0.00</span></div>
-            </div>
-            <!-- Diğer modüller buraya eklenecek -->
           </div>
         </div>
     </div>

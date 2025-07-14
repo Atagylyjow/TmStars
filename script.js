@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Alt menüdeki profil sekmesi
     const profileNavBtn = document.getElementById('profile-nav-btn');
     if (profileNavBtn) {
-        profileNavBtn.addEventListener('click', openProfileModal);
+        profileNavBtn.addEventListener('click', showProfileSection);
     }
     document.getElementById('profile-modal-close').addEventListener('click', closeProfileModal);
     window.addEventListener('click', function(event) {
@@ -767,10 +767,14 @@ function closeLevelModal() {
     document.getElementById('level-modal').style.display = 'none';
 } 
 
-function openProfileModal() {
-    // Kullanıcı bilgileri
+// Profil modalı fonksiyonlarını kaldırıyorum. Profil sekmesine tıklanınca ana içerikteki profile-section'ı gösteriyorum.
+function showProfileSection() {
+    // Tüm ana section'ları gizle
+    document.querySelectorAll('.main-content > section').forEach(sec => sec.style.display = 'none');
+    // Profil section'ı göster
+    document.getElementById('profile-section').style.display = 'block';
+    // Kullanıcı bilgilerini doldur
     const user = userData;
-    // Profil fotoğrafı (Telegram'dan alınabiliyorsa)
     let photoUrl = '';
     if (window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.photo_url) {
         photoUrl = window.Telegram.WebApp.initDataUnsafe.user.photo_url;
@@ -792,8 +796,11 @@ function openProfileModal() {
     };
     document.getElementById('profile-ref-count').textContent = user.refCount || 0;
     document.getElementById('profile-ref-stars').textContent = user.refStars ? user.refStars.toFixed(2) : '0.00';
-    document.getElementById('profile-modal').style.display = 'block';
 }
-function closeProfileModal() {
-    document.getElementById('profile-modal').style.display = 'none';
-} 
+// Alt menüdeki profil sekmesine tıklanınca showProfileSection çağrılacak.
+document.addEventListener('DOMContentLoaded', function() {
+    const profileNavBtn = document.getElementById('profile-nav-btn');
+    if (profileNavBtn) {
+        profileNavBtn.addEventListener('click', showProfileSection);
+    }
+}); 

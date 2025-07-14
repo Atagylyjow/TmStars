@@ -890,15 +890,21 @@ body {
     color: var(--primary-gold);
 }
 
-.profile-modal-content {
-    max-width: 400px;
-    margin: 2rem auto;
+.profile-section {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 60vh;
+    padding: 2rem 0 3rem 0;
+}
+.profile-card {
     background: var(--bg-card);
-    border-radius: 16px;
-    padding: 2rem 1.2rem 1.2rem 1.2rem;
+    border-radius: 18px;
     box-shadow: var(--shadow);
-    position: relative;
-    text-align: center;
+    padding: 2rem 1.2rem 1.2rem 1.2rem;
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
 }
 .profile-header {
     display: flex;
@@ -935,4 +941,36 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+} 
+
+.profile-referral {
+    margin-top: 1.2rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    font-size: 1.01rem;
+    color: var(--text-primary);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+#profile-ref-link {
+    word-break: break-all;
+    color: var(--secondary-blue);
+    font-weight: 500;
+}
+#copy-ref-link {
+    background: none;
+    border: none;
+    color: var(--primary-gold);
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-left: 0.3rem;
+    vertical-align: middle;
+    transition: color 0.2s;
+}
+#copy-ref-link:hover {
+    color: var(--accent-orange);
 } 
