@@ -1,7 +1,7 @@
 {
-  "name": "vpn-script-hub-backend",
+  "name": "starearn-backend",
   "version": "1.0.0",
-  "description": "Backend for VPN Script Hub Telegram Web App",
+  "description": "Backend for StarEarn - Reklam izleyerek yıldız kazanma Telegram Web App",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
