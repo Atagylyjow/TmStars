@@ -135,13 +135,18 @@ bot.on('polling_error', (error) => {
 // Web App URL (güncel URL'nizi buraya yazın)
 const WEB_APP_URL = 'https://tmstars.onrender.com/';
 
-bot.onText(/\/start/, (msg) => {
+bot.onText(/\/start(?:\s+ref_(\d+))?/, (msg, match) => {
     const chatId = msg.chat.id;
+    const refId = match && match[1] ? match[1] : null;
+    let webAppUrl = WEB_APP_URL;
+    if (refId) {
+        webAppUrl += `?ref=${refId}`;
+    }
     const opts = {
         reply_markup: {
             inline_keyboard: [
                 [
-                    { text: '⭐ StarEarn\'a Git', web_app: { url: WEB_APP_URL } }
+                    { text: '⭐ TmStars Mini App', web_app: { url: webAppUrl } }
                 ],
                 [
                     { text: '🆔 ID Öğren', callback_data: 'get_id' }
@@ -149,7 +154,7 @@ bot.onText(/\/start/, (msg) => {
             ]
         }
     };
-    bot.sendMessage(chatId, 'Hoş geldin! 👋\n\nStarEarn uygulamasına hoş geldiniz! Reklam izleyerek yıldız kazanabilirsiniz.', opts);
+    bot.sendMessage(chatId, 'Hoş geldin! 👋\n\nTmStars uygulamasına hoş geldiniz! Reklam izleyerek yıldız kazanabilirsiniz.', opts);
 });
 
 bot.on('callback_query', (query) => {
