@@ -28,6 +28,7 @@
                         <i class="fas fa-star"></i>
                         <span id="user-stars">0.00</span>
                         <span class="level-indicator" id="user-level">1. Seviye</span>
+                        <button class="level-info-btn" id="level-info-btn" title="Seviye Bilgisi"><i class="fas fa-medal"></i></button>
                     </div>
                 </div>
                 <div class="theme-toggle" id="theme-toggle"></div>
@@ -259,6 +260,22 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Seviye Bilgisi Modal -->
+        <div class="modal" id="level-modal">
+          <div class="modal-content level-modal-content">
+            <span class="modal-close" id="level-modal-close">&times;</span>
+            <h2>Seviye Sistemi</h2>
+            <div id="level-modal-user-info"></div>
+            <table class="level-table">
+              <thead>
+                <tr><th>Seviye</th><th>Reklam Aralığı</th><th>Çarpan</th></tr>
+              </thead>
+              <tbody id="level-table-body"></tbody>
+            </table>
+            <div id="level-modal-next-info" class="level-next-info"></div>
+          </div>
         </div>
     </div>
 

@@ -49,6 +49,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     await loadUserData();
     updateUI();
     await loadLeaderboard();
+    // Seviye modalı eventleri
+    document.getElementById('level-info-btn').addEventListener('click', openLevelModal);
+    document.getElementById('level-modal-close').addEventListener('click', closeLevelModal);
+    window.addEventListener('click', function(event) {
+        if (event.target === document.getElementById('level-modal')) {
+            closeLevelModal();
+        }
+    });
 });
 
 // Initialize app
@@ -716,3 +724,31 @@ document.addEventListener('DOMContentLoaded', function() {
         updateThemeToggleIcon('light');
     }
 }); 
+
+function openLevelModal() {
+    // Kullanıcı bilgileri
+    const watched = userData.totalAdsWatched || 0;
+    const level = userData.level || 1;
+    const multiplier = LEVELS[level-1].multiplier;
+    document.getElementById('level-modal-user-info').innerHTML = `Mevcut seviyeniz: <b>${level}. Seviye</b> <br>Çarpan: <b>${multiplier.toFixed(2)}x</b> <br>Toplam izlenen reklam: <b>${watched}</b>`;
+    // Tablo
+    let table = '';
+    for (let i = 0; i < LEVELS.length; i++) {
+        const rowClass = (i+1) === level ? 'current-level' : '';
+        table += `<tr class="${rowClass}"><td>${i+1}</td><td>${LEVELS[i].min} - ${LEVELS[i].max === Infinity ? '+' : LEVELS[i].max}</td><td>${LEVELS[i].multiplier.toFixed(2)}x</td></tr>`;
+    }
+    document.getElementById('level-table-body').innerHTML = table;
+    // Sonraki seviyeye kalan reklam
+    let nextInfo = '';
+    if (level < LEVELS.length) {
+        const kalan = LEVELS[level].min - watched;
+        nextInfo = `Sonraki seviyeye geçmek için <b>${kalan}</b> reklam daha izlemelisin.`;
+    } else {
+        nextInfo = 'Maksimum seviyedesiniz!';
+    }
+    document.getElementById('level-modal-next-info').innerHTML = nextInfo;
+    document.getElementById('level-modal').style.display = 'block';
+}
+function closeLevelModal() {
+    document.getElementById('level-modal').style.display = 'none';
+} 
