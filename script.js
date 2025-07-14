@@ -44,6 +44,11 @@ const API_BASE_URL = 'http://localhost:3000/api';
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', async function() {
+    initializeApp();
+    setupEventListeners();
+    await loadUserData();
+    updateUI();
+    await loadLeaderboard();
     // Seviye modalı eventleri
     const levelInfoBtn = document.getElementById('level-info-btn');
     if (levelInfoBtn) {
@@ -69,62 +74,107 @@ document.addEventListener('DOMContentLoaded', async function() {
     addLevelInfoBtnListener(); // Sayfa yüklendiğinde ve profil section gösterildiğinde çağır
 });
 
+// Initialize app
+function initializeApp() {
+    // Set theme colors
+    tg.setHeaderColor('#FFD700');
+    tg.setBackgroundColor('#f8f9fa');
+    
+    // Get user info
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        const user = tg.initDataUnsafe.user;
+        userData.userId = user.id;
+        userData.username = user.username || `User${user.id}`;
+        userData.firstName = user.first_name || 'User';
+        userData.lastName = user.last_name || '';
+    }
+    
+    // Update user info display
+    document.getElementById('user-name').textContent = userData.firstName;
+    document.getElementById('user-id').textContent = `ID: ${userData.userId}`;
+}
+
 // Setup event listeners
 function setupEventListeners() {
     // Watch ad button
-    document.getElementById('watch-ad-btn').addEventListener('click', watchAd);
-    
+    const watchAdBtn = document.getElementById('watch-ad-btn');
+    if (watchAdBtn) {
+        // Önce eski event'i temizle
+        watchAdBtn.replaceWith(watchAdBtn.cloneNode(true));
+        const newWatchAdBtn = document.getElementById('watch-ad-btn');
+        newWatchAdBtn.addEventListener('click', watchAd);
+    }
     // Task buttons
+    document.querySelectorAll('.task-btn').forEach(btn => {
+        btn.replaceWith(btn.cloneNode(true));
+    });
     document.querySelectorAll('.task-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const taskType = this.dataset.task;
             claimTaskReward(taskType);
         });
     });
-    
     // Withdrawal buttons
+    document.querySelectorAll('.withdrawal-btn').forEach(btn => {
+        btn.replaceWith(btn.cloneNode(true));
+    });
     document.querySelectorAll('.withdrawal-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const method = this.dataset.method;
             showWithdrawalModal(method);
         });
     });
-    
     // Navigation buttons
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.replaceWith(btn.cloneNode(true));
+    });
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const section = this.dataset.section;
             navigateToSection(section);
         });
     });
-    
     // Leaderboard tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.replaceWith(btn.cloneNode(true));
+    });
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const tab = this.dataset.tab;
             switchLeaderboardTab(tab);
         });
     });
-    
     // Modal close buttons
+    document.querySelectorAll('.modal-close').forEach(closeBtn => {
+        closeBtn.replaceWith(closeBtn.cloneNode(true));
+    });
     document.querySelectorAll('.modal-close').forEach(closeBtn => {
         closeBtn.addEventListener('click', function() {
             this.closest('.modal').style.display = 'none';
         });
     });
-    
     // Withdrawal form
-    document.getElementById('withdrawal-confirm').addEventListener('click', confirmWithdrawal);
-    document.getElementById('withdrawal-cancel').addEventListener('click', function() {
-        document.getElementById('withdrawal-modal').style.display = 'none';
-    });
-    
+    const withdrawalConfirm = document.getElementById('withdrawal-confirm');
+    if (withdrawalConfirm) {
+        withdrawalConfirm.replaceWith(withdrawalConfirm.cloneNode(true));
+        document.getElementById('withdrawal-confirm').addEventListener('click', confirmWithdrawal);
+    }
+    const withdrawalCancel = document.getElementById('withdrawal-cancel');
+    if (withdrawalCancel) {
+        withdrawalCancel.replaceWith(withdrawalCancel.cloneNode(true));
+        document.getElementById('withdrawal-cancel').addEventListener('click', function() {
+            document.getElementById('withdrawal-modal').style.display = 'none';
+        });
+    }
     // Theme toggle
-    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-    
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.replaceWith(themeToggle.cloneNode(true));
+        document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+    }
     // Close modals when clicking outside
     window.addEventListener('click', function(event) {
-        if (event.target.classList.contains('modal')) {
+        if (event.target.classList && event.target.classList.contains('modal')) {
             event.target.style.display = 'none';
         }
     });
@@ -408,7 +458,7 @@ function showWithdrawalModal(method) {
     
     if (method === 'phone') {
         phoneGroup.style.display = 'block';
-    } else {
+            } else {
         phoneGroup.style.display = 'none';
     }
     
@@ -557,7 +607,7 @@ function displayLeaderboard(leaderboard) {
                 <div class="username">${user.username}</div>
                 <div class="stars">${user.stars.toFixed(2)} yıldız</div>
             </div>
-        </div>
+            </div>
     `).join('');
 }
 
@@ -780,8 +830,6 @@ function addLevelInfoBtnListener() {
 } 
 
 async function showSection(sectionName) {
-    // Kullanıcı bilgilerini ve header'ı güncelle
-    initializeApp();
     // Tüm ana section'ları gizle
     document.querySelectorAll('.main-content > section').forEach(sec => sec.style.display = 'none');
     // İlgili section'ı göster

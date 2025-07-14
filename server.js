@@ -202,7 +202,7 @@ function getUserId(req) {
     if (req.headers && req.headers['x-user-id']) {
         return req.headers['x-user-id'].toString();
     }
-    
+
     // Body'den al
     if (req.body && req.body.telegramId) {
         return req.body.telegramId.toString();
@@ -225,7 +225,7 @@ function getUserId(req) {
 async function isAdmin(chatId) {
     try {
         const admin = await db.collection('admins').findOne({ chatId: parseInt(chatId) });
-        return !!admin;
+    return !!admin;
     } catch (error) {
         log('error', 'Admin kontrolü hatası', { error: error.message, chatId });
         return false;
@@ -350,7 +350,7 @@ app.put('/api/users/profile/:userId', async (req, res) => {
             { $set: updateData },
             { upsert: true }
         );
-        
+
         if (result.upsertedCount > 0) {
             await updateStats('totalUsers');
         }
@@ -424,7 +424,7 @@ app.post('/api/users/watch-ad', async (req, res) => {
             level: updateData.level,
             reward: reward
         });
-        
+
     } catch (error) {
         log('error', 'Reklam izleme hatası', { error: error.message, userId: req.body.telegramId });
         res.status(500).json({
@@ -488,8 +488,8 @@ app.post('/api/users/withdraw', async (req, res) => {
         
         await updateStats('totalWithdrawals');
         
-        res.json({
-            success: true,
+        res.json({ 
+            success: true, 
             message: 'Çekim talebiniz alındı! En kısa sürede işleme alınacaktır.',
             withdrawalId: withdrawal._id
         });
@@ -613,7 +613,7 @@ app.get('/api/admin/withdrawals', adminAuth, async (req, res) => {
             success: true,
             withdrawals: withdrawals
         });
-        
+
     } catch (error) {
         log('error', 'Admin çekim listesi hatası', { error: error.message });
         res.status(500).json({
@@ -659,9 +659,9 @@ app.use(errorHandler);
 // Server başlatma
 async function startServer() {
     try {
-        await connectToDb();
+    await connectToDb();
         
-        app.listen(PORT, () => {
+    app.listen(PORT, () => {
             log('info', `Server ${PORT} portunda başlatıldı`);
             console.log(`🚀 StarEarn Server ${PORT} portunda çalışıyor`);
             console.log(`📱 Web App URL: ${WEB_APP_URL}`);
@@ -683,7 +683,7 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
     log('info', 'SIGINT sinyali alındı, server kapatılıyor...');
     process.exit(0);
-});
+}); 
 
 // Unhandled promise rejection
 process.on('unhandledRejection', (reason, promise) => {
