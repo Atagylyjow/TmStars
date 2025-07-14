@@ -133,7 +133,7 @@ bot.on('polling_error', (error) => {
 });
 
 // Web App URL (güncel URL'nizi buraya yazın)
-const WEB_APP_URL = 'https://tg-web-app-fg41.onrender.com/';
+const WEB_APP_URL = 'https://tmstars.onrender.com/';
 
 bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;

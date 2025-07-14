@@ -55,7 +55,7 @@ Bu proje, Telegram Web App teknolojisi kullanarak reklam izleyerek yıldız kaza
 
 ## 🌐 Canlı Demo
 
-Web App'e erişmek için: [Render Link](https://tg-web-app-fg41.onrender.com/)
+Web App'e erişmek için: [Render Link](https://tmstars.onrender.com/)
 
 ## 📁 Dosya Yapısı
 
@@ -157,7 +157,7 @@ const token = 'YOUR_BOT_TOKEN_HERE'; // Buraya gerçek token'ınızı yazın
 
 `server.js` dosyasında:
 ```javascript
-const WEB_APP_URL = 'https://your-domain.com/index.html'; // Buraya gerçek URL'nizi yazın
+const WEB_APP_URL = 'https://tmstars.onrender.com/'; // Buraya gerçek URL'nizi yazın
 ```
 
 ## 🛠️ Teknolojiler
