@@ -20,6 +20,15 @@
     --gradient-primary: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
     --gradient-secondary: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
     --gradient-accent: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+    /* Tema uyumlu özel alanlar */
+    --header-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    --header-gradient-dark: linear-gradient(135deg, #232323 0%, #444444 100%);
+    --welcome-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    --welcome-gradient-dark: linear-gradient(135deg, #232323 0%, #444444 100%);
+    --star-bg: rgba(255,255,255,0.9);
+    --star-bg-dark: rgba(30,58,138,0.9);
+    --star-color: #1E3A8A;
+    --star-color-dark: #FFD700;
 }
 
 /* Dark Theme */
@@ -30,6 +39,10 @@
     --text-primary: #ffffff;
     --text-secondary: #b0b0b0;
     --border-color: #404040;
+    --header-gradient: var(--header-gradient-dark);
+    --welcome-gradient: var(--welcome-gradient-dark);
+    --star-bg: var(--star-bg-dark);
+    --star-color: var(--star-color-dark);
 }
 
 * {
@@ -57,7 +70,7 @@ body {
 
 /* Header */
 .header {
-    background: var(--gradient-primary);
+    background: var(--header-gradient);
     padding: 1rem;
     position: sticky;
     top: 0;
@@ -95,11 +108,11 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--star-bg);
     padding: 0.5rem 1rem;
     border-radius: 25px;
     font-weight: bold;
-    color: var(--secondary-blue);
+    color: var(--star-color);
     box-shadow: var(--shadow);
 }
 
@@ -118,12 +131,12 @@ body {
 }
 
 .theme-toggle {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--star-bg);
     border: none;
     padding: 0.5rem;
     border-radius: 50%;
     cursor: pointer;
-    color: var(--secondary-blue);
+    color: var(--star-color);
     transition: all 0.3s ease;
 }
 
@@ -143,11 +156,11 @@ body {
 }
 
 .welcome-card {
-    background: var(--gradient-primary);
+    background: var(--welcome-gradient);
     padding: 2rem;
     border-radius: 20px;
     text-align: center;
-    color: var(--secondary-blue);
+    color: var(--star-color);
     box-shadow: var(--shadow);
 }
 
