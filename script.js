@@ -795,7 +795,7 @@ function showProfileSection() {
     document.getElementById('profile-join-date').textContent = joinDate ? new Date(joinDate).toLocaleDateString('tr-TR') : '-';
     // Davet linki ve istatistikler
     const refId = user.userId || user.telegramId || '-';
-    const refLink = refId !== '-' ? `${window.location.origin}/?ref=${refId}` : '-';
+    const refLink = refId !== '-' ? `https://t.me/TmStarts_bot?start=ref_${refId}` : '-';
     document.getElementById('profile-ref-link').textContent = refLink;
     document.getElementById('copy-ref-link').onclick = function() {
         if (refLink && refLink !== '-') {
