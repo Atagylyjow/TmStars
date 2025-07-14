@@ -44,11 +44,6 @@ const API_BASE_URL = 'http://localhost:3000/api';
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', async function() {
-    initializeApp();
-    setupEventListeners();
-    await loadUserData();
-    updateUI();
-    await loadLeaderboard();
     // Seviye modalı eventleri
     const levelInfoBtn = document.getElementById('level-info-btn');
     if (levelInfoBtn) {
@@ -73,26 +68,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
     addLevelInfoBtnListener(); // Sayfa yüklendiğinde ve profil section gösterildiğinde çağır
 });
-
-// Initialize app
-function initializeApp() {
-    // Set theme colors
-    tg.setHeaderColor('#FFD700');
-    tg.setBackgroundColor('#f8f9fa');
-    
-    // Get user info
-    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        const user = tg.initDataUnsafe.user;
-        userData.userId = user.id;
-        userData.username = user.username || `User${user.id}`;
-        userData.firstName = user.first_name || 'User';
-        userData.lastName = user.last_name || '';
-    }
-    
-    // Update user info display
-    document.getElementById('user-name').textContent = userData.firstName;
-    document.getElementById('user-id').textContent = `ID: ${userData.userId}`;
-}
 
 // Setup event listeners
 function setupEventListeners() {
