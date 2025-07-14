@@ -769,12 +769,13 @@ function closeLevelModal() {
 } 
 
 // Profil modalı fonksiyonlarını kaldırıyorum. Profil sekmesine tıklanınca ana içerikteki profile-section'ı gösteriyorum.
-function showProfileSection() {
+async function showProfileSection() {
     // Tüm ana section'ları gizle
     document.querySelectorAll('.main-content > section').forEach(sec => sec.style.display = 'none');
     // Profil section'ı göster
     document.getElementById('profile-section').style.display = 'block';
-    // Kullanıcı bilgilerini doldur
+    // Profil açıldığında kullanıcı verisini güncelle
+    await loadUserData();
     const user = userData;
     let photoUrl = '';
     if (window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.photo_url) {
@@ -806,6 +807,7 @@ function showProfileSection() {
     document.getElementById('profile-ref-count').textContent = user.refCount || 0;
     document.getElementById('profile-ref-stars').textContent = user.refStars ? user.refStars.toFixed(2) : '0.00';
     addLevelInfoBtnListener(); // Her profil gösteriminde tekrar ekle
+    setupEventListeners(); // Profildeki butonlar için tekrar ekle
 }
 // Alt menüdeki profil sekmesine tıklanınca showProfileSection çağrılacak.
 document.addEventListener('DOMContentLoaded', function() {
@@ -822,14 +824,19 @@ function addLevelInfoBtnListener() {
     });
 } 
 
-function showSection(sectionName) {
+async function showSection(sectionName) {
     // Tüm ana section'ları gizle
     document.querySelectorAll('.main-content > section').forEach(sec => sec.style.display = 'none');
     // İlgili section'ı göster
     const sec = document.getElementById(sectionName + '-section');
     if (sec) sec.style.display = 'block';
+    // Her section geçişinde kullanıcı verisini güncelle
+    await loadUserData();
+    updateUI();
+    setupEventListeners(); // Event listener'ları tekrar ekle
+    addLevelInfoBtnListener(); // Seviye modalı butonları için tekrar ekle
     // Ekstra: Profil gösteriliyorsa profil bilgilerini doldur
-    if (sectionName === 'profile') showProfileSection();
+    if (sectionName === 'profile') await showProfileSection();
 }
 // Alt menüdeki tüm sekmelere event ekle
 
